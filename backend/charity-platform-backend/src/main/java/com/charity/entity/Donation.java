@@ -61,17 +61,3 @@ public class Donation {
         status = DonationStatus.PENDING;
     }
 }
-
-// ==================== DONATION TYPE ENUM ====================
-enum DonationType {
-    CASH,
-    ITEM,
-    SERVICE
-}
-
-// ==================== DONATION STATUS ENUM ====================
-enum DonationStatus {
-    PENDING,
-    RECEIVED,
-    USED
-}
