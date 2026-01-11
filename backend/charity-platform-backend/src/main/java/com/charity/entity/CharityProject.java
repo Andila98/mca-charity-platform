@@ -72,10 +72,3 @@ public class CharityProject {
         updatedAt = LocalDateTime.now();
     }
 }
-
-// ==================== PROJECT STATUS ENUM ====================
-enum ProjectStatus {
-    PLANNED,
-    ONGOING,
-    COMPLETED
-}

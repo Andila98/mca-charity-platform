@@ -68,10 +68,3 @@ public class Event {
     }
 }
 
-// ==================== EVENT STATUS ENUM ====================
-enum EventStatus {
-    PLANNED,
-    ONGOING,
-    COMPLETED,
-    CANCELLED
-}

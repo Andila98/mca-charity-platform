@@ -64,9 +64,3 @@ public class User {
     }
 }
 
-// ==================== USER ROLE ENUM ====================
-enum UserRole {
-    ADMIN,    // Full system access
-    EDITOR,   // Can create/edit content
-    VIEWER    // Read-only access
-}

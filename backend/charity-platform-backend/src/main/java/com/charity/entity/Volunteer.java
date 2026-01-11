@@ -56,10 +56,3 @@ public class Volunteer {
         status = VolunteerStatus.ACTIVE;
     }
 }
-
-// ==================== VOLUNTEER STATUS ENUM ====================
-enum VolunteerStatus {
-    ACTIVE,
-    INACTIVE,
-    SUSPENDED
-}
