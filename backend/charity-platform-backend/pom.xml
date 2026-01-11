@@ -6,9 +6,9 @@
     <groupId>com.charity</groupId>
     <artifactId>charity-platform-backend</artifactId>
     <version>0.0.1-SNAPSHOT-MVP</version>
-    <packageing>jar</packageing>
+	<packaging>jar</packaging>
 
-    <name>charity-platform-backend</name>
+	<name>charity-platform-backend</name>
     <description>Charity-First Digital Platform with Campaign Capabilities project for Spring Boot</description>
 
     <!-- Spring Boot Parent -->
