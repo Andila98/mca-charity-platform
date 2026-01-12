@@ -44,10 +44,8 @@ public class Volunteer {
 
     private String profileImageUrl;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime registeredAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime lastActiveAt;
 
     @PrePersist

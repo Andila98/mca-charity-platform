@@ -49,10 +49,8 @@ public class Donation {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime donatedAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime receivedAt;
 
     @PrePersist

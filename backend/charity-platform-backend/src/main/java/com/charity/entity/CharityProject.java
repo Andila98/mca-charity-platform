@@ -44,20 +44,16 @@ public class CharityProject {
 
     private int actualBeneficiaries;
 
-    @Temporal(TemporalType.DATE)
     private LocalDateTime startDate;
 
-    @Temporal(TemporalType.DATE)
     private LocalDateTime endDate;
 
     @ManyToOne
     @JoinColumn(name = "created_by_id", nullable = false)
     private User createdBy; // Which admin/editor created this
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
 
     @PrePersist

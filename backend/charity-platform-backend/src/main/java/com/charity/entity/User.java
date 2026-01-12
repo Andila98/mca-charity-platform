@@ -45,11 +45,10 @@ public class User {
 
     private boolean approved; // Admin approval status
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
+
 
     @PrePersist
     protected void onCreate() {
