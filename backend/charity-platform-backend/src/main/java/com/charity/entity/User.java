@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.List;
+
 
 @Entity
 @Table(name = "users")
@@ -43,19 +43,18 @@ public class User {
 
     private String profileImageUrl;
 
-    private boolean isApproved; // Admin approval status
+    private boolean approved; // Admin approval status
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
+
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        isApproved = false;
+        approved = false;
     }
 
     @PreUpdate
