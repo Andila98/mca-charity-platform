@@ -66,14 +66,14 @@ public class UserService {
      * Get all approved users
      */
     public List<User> getAllApprovedUsers() {
-        return userRepository.findByIsApprovedTrue();
+        return userRepository.findByApprovedTrue();
     }
 
     /**
      * Get all pending approvals (unapproved users)
      */
     public List<User> getPendingApprovals() {
-        return userRepository.findByIsApprovedFalse();
+        return userRepository.findByApprovedFalse();
     }
 
     /**

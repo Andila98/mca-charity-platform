@@ -27,12 +27,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Find all approved users (for security)
      */
-    List<User> findByIsApprovedTrue();
+    List<User> findByApprovedTrue();
 
     /**
      * Find all unapproved users (for admin to review)
      */
-    List<User> findByIsApprovedFalse();
+    List<User> findByApprovedFalse();
 
     /**
      * Find all users in a specific ward (Kenya-specific)
