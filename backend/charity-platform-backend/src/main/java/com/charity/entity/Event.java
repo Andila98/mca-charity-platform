@@ -30,10 +30,8 @@ public class Event {
     private String location; // e.g., "Kibra High School, Nairobi"
 
     @NotNull(message = "Event date is required")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime eventDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime eventEndTime;
 
     private String eventImageUrl;
@@ -58,7 +56,6 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus status; // PLANNED, ONGOING, COMPLETED, CANCELLED
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
     @PrePersist
