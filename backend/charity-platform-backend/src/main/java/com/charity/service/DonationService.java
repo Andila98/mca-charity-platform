@@ -111,9 +111,14 @@ public class DonationService {
      * Calculate total donations for a project
      */
     public Double getTotalDonationsForProject(Long projectId) {
+        projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("..."));
+
         Double total = donationRepository.calculateTotalDonationsForProject(projectId);
         return total != null ? total : 0.0;
     }
+
+
 
     /**
      * Calculate total donations by type
@@ -135,5 +140,14 @@ public class DonationService {
      */
     public List<Donation> getDonationsByDonorWard(String ward) {
         return donationRepository.findByDonorWard(ward);
+    }
+
+    /**
+     * Delete a donation record
+     */
+    public void deleteDonation(Long id) {
+        Donation donation = getDonationById(id);
+        donationRepository.delete(donation);
+        log.info("Donation record deleted: ID {}", id);
     }
 }

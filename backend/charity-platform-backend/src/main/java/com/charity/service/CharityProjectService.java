@@ -128,4 +128,13 @@ public class CharityProjectService {
     public long countProjectsByStatus(ProjectStatus status) {
         return projectRepository.countByStatus(status);
     }
+
+    /**
+     * Delete a project
+     */
+    public void deleteProject(Long id) {
+        CharityProject project = getProjectById(id);
+        projectRepository.delete(project);
+        log.info("Project deleted: ID {}", id);
+    }
 }

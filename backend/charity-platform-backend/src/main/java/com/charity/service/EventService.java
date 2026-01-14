@@ -94,6 +94,13 @@ public class EventService {
     }
 
     /**
+     * Get all events with a specific status
+     */
+    public List<Event> getEventsByStatus(EventStatus status) {
+        return eventRepository.findByStatus(status);
+    }
+
+    /**
      * Register volunteer for event
      */
     public Event registerVolunteerForEvent(Long eventId, Long volunteerId) {
@@ -136,6 +143,14 @@ public class EventService {
         return updatedEvent;
     }
 
+    public Event updateEvent(Long id, Event updatedEvent) {
+        Event existing = getEventById(id);
+        // Note: Since 'existing' is a managed entity,
+        // simply updating its fields and exiting the @Transactional method
+        // will often save it automatically, but .save() is fine for clarity.
+        return eventRepository.save(existing);
+    }
+
     /**
      * Update actual attendance
      */
@@ -151,5 +166,10 @@ public class EventService {
     public int getRegisteredVolunteerCount(Long eventId) {
         Event event = getEventById(eventId);
         return event.getRegisteredVolunteerIds().size();
+    }
+
+    public void deleteEvent(Long id) {
+        Event event = getEventById(id);
+        eventRepository.delete(event);
     }
 }
