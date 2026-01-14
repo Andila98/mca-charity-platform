@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Charity API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            border-left-color: #f44336;
+            background-color: #ffebee;
+        }
+        h1 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .section:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎯 Charity Platform API Tester</h1>
+
+    <div class="section">
+        <h2>Test Endpoints</h2>
+        <button onclick="testGetUsers()">Get All Users</button>
+        <button onclick="testGetProjects()">Get All Projects</button>
+        <button onclick="testGetVolunteers()">Get All Volunteers</button>
+        <button onclick="testGetEvents()">Get All Events</button>
+        <button onclick="testGetDonations()">Get All Donations</button>
+    </div>
+
+    <div class="section">
+        <h2>Create Test Data</h2>
+        <button onclick="testRegisterUser()">Register User</button>
+        <button onclick="testCreateVolunteer()">Create Volunteer</button>
+        <button onclick="testCreateProject()">Create Project</button>
+    </div>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8080/api';
+
+    function displayResult(data, error = false) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.className = error ? 'error' : '';
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function makeRequest(url, method = 'GET', body = null) {
+        try {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            const response = await fetch(url, options);
+            const data = await response.json();
+
+            displayResult({
+                status: response.status,
+                statusText: response.statusText,
+                data: data
+            }, !response.ok);
+        } catch (error) {
+            displayResult({
+                error: error.message,
+                details: 'Check if backend is running on http://localhost:8080'
+            }, true);
+        }
+    }
+
+    // GET requests
+    function testGetUsers() {
+        makeRequest(`${API_BASE_URL}/users`);
+    }
+
+    function testGetProjects() {
+        makeRequest(`${API_BASE_URL}/projects`);
+    }
+
+    function testGetVolunteers() {
+        makeRequest(`${API_BASE_URL}/volunteers`);
+    }
+
+    function testGetEvents() {
+        makeRequest(`${API_BASE_URL}/events`);
+    }
+
+    function testGetDonations() {
+        makeRequest(`${API_BASE_URL}/donations`);
+    }
+
+    // POST requests
+    function testRegisterUser() {
+        const userData = {
+            email: "test@charity.org",
+            password: "password123",
+            fullName: "Test User",
+            phone: "+254712345678",
+            ward: "Westlands",
+            role: "VIEWER"
+        };
+        makeRequest(`${API_BASE_URL}/auth/register`, 'POST', userData);
+    }
+
+    function testCreateVolunteer() {
+        const volunteerData = {
+            name: "Jane Doe",
+            email: "jane@example.com",
+            phone: "+254723456789",
+            ward: "Kilimani",
+            interests: ["Education", "Healthcare"],
+            status: "ACTIVE",
+            bio: "Passionate about community development"
+        };
+        makeRequest(`${API_BASE_URL}/volunteers`, 'POST', volunteerData);
+    }
+
+    function testCreateProject() {
+        const projectData = {
+            name: "Clean Water Initiative",
+            description: "Providing clean water to rural communities",
+            ward: "Westlands",
+            status: "PLANNED",
+            category: "Water & Sanitation",
+            targetBeneficiaries: 500,
+            actualBeneficiaries: 0,
+            createdById: 1
+        };
+        makeRequest(`${API_BASE_URL}/projects`, 'POST', projectData);
+    }
+</script>
+</body>
+</html>
