@@ -119,11 +119,40 @@ nav a:hover {
     color: var(--dark);
 }
 
-.form-wrapper {
-    max-width: 700px;
-    margin: 0 auto;
+.content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.impact-section h2 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.impact-card {
     background: white;
-    padding: 3rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--accent);
+}
+
+.impact-card h3 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.impact-card p {
+    color: var(--gray);
+    font-size: 0.95rem;
+}
+
+.form-wrapper {
+    background: white;
+    padding: 2.5rem;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
@@ -134,7 +163,7 @@ form {
 }
 
 .form-group {
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.5rem;
 }
 
 label {
@@ -165,31 +194,26 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
 }
 
-textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
-.checkbox-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+.radio-group {
+    display: flex;
+    gap: 1.5rem;
     margin-top: 0.6rem;
+    flex-wrap: wrap;
 }
 
-.checkbox-item {
+.radio-item {
     display: flex;
     align-items: center;
     gap: 0.6rem;
 }
 
-.checkbox-item input[type="checkbox"] {
+.radio-item input[type="radio"] {
     width: auto;
     margin: 0;
     cursor: pointer;
 }
 
-.checkbox-item label {
+.radio-item label {
     margin: 0;
     font-weight: 500;
     cursor: pointer;
@@ -241,6 +265,7 @@ textarea {
     border-radius: 6px;
     text-align: center;
     display: none;
+    grid-column: 1/-1;
 }
 
 .success-message.show {
@@ -252,10 +277,6 @@ textarea {
     color: #155724;
 }
 
-.success-message p {
-    margin-bottom: 0.5rem;
-}
-
 .success-icon {
     font-size: 2.5rem;
     margin-bottom: 1rem;
@@ -265,8 +286,8 @@ textarea {
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top: 3px solid white;
+    border: 3px solid rgba(0, 51, 102, 0.3);
+    border-top: 3px solid var(--dark);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-right: 0.5rem;
@@ -277,6 +298,7 @@ textarea {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -285,6 +307,35 @@ textarea {
 .required::after {
     content: " *";
     color: var(--error);
+}
+
+.donation-presets {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+    margin-top: 0.6rem;
+}
+
+.preset-btn {
+    padding: 0.8rem;
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    color: var(--text);
+}
+
+.preset-btn:hover {
+    border-color: var(--accent);
+    background: #f0f8ff;
+}
+
+.preset-btn.selected {
+    background: var(--accent);
+    color: var(--light-text);
+    border-color: var(--accent);
 }
 
 footer {
@@ -296,17 +347,18 @@ footer {
     margin-top: 5rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 968px) {
     .hero h1 {
         font-size: 2rem;
     }
 
-    .form-wrapper {
-        padding: 1.5rem;
+    .content-wrapper {
+        grid-template-columns: 1fr;
+        gap: 2rem;
     }
 
-    .checkbox-group {
-        grid-template-columns: 1fr;
+    .donation-presets {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     nav {
