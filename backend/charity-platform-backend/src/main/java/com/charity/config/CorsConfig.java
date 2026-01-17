@@ -1,6 +1,5 @@
 package com.charity.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -11,6 +10,12 @@ import java.util.Arrays;
 
 @Configuration
 public class CorsConfig {
+
+    /**
+     * CORS Configuration Bean
+     * Allows frontend to communicate with backend
+     */
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -23,6 +28,12 @@ public class CorsConfig {
                 "http://localhost:8081",      // Alternative port
                 "http://localhost:4200",      // Angular default
                 "http://localhost:5173",      // Vite default
+                "http://localhost:80",
+                "http://localhost",
+                "file://",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:80",
+                "http://127.0.0.1",
                 "*"                           // Allow all (for development only!)
         ));
 
@@ -43,7 +54,8 @@ public class CorsConfig {
                 "Accept",
                 "Origin",
                 "Access-Control-Request-Method",
-                "Access-Control-Request-Headers"
+                "Access-Control-Request-Headers",
+                "X-Requested-With"
         ));
 
         // Expose these headers to the frontend
@@ -60,7 +72,7 @@ public class CorsConfig {
 
         // Apply this configuration to all endpoints
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/api/**", configuration);
 
         return source;
     }
