@@ -43,6 +43,13 @@ public class VolunteerService {
     }
 
     /**
+     * Get volunteers by their current status (ACTIVE, SUSPENDED, etc.)
+     */
+    public List<Volunteer> getVolunteersByStatus(VolunteerStatus status) {
+        return volunteerRepository.findByStatus(status);
+    }
+
+    /**
      * Get all active volunteers
      */
     public List<Volunteer> getAllActiveVolunteers() {

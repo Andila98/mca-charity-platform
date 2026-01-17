@@ -1,5 +1,6 @@
 package com.charity.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,10 +8,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CorsConfigurationSource corsConfigurationSource;
 
     /**
      * Password Encoder Bean
@@ -28,16 +33,46 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for API testing (enable in production!)
+                // Enable CORS with our configuration
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+
+                // Disable CSRF for testing (enable in production with proper setup)
+                .csrf(csrf -> csrf.disable())
+
+                // Configure authorization
+                // Authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // Public endpoints
-                        .anyRequest().authenticated() // All other endpoints require authentication
+                        // Public endpoints
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/v1/projects",
+                                "/api/v1/projects/**",
+                                "/api/v1/events",
+                                "/api/v1/events/**",
+                                "/api/v1/volunteers/register",
+                                "/api/v1/donations",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // All other endpoints require authentication
+                        .anyRequest().authenticated()
+                )
+
+                // Exception handling
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/json");
+                            response.getWriter().write(
+                                    "{\"error\": \"Unauthorized\", \"message\": \""
+                                            + authException.getMessage() + "\"}"
+                            );
+                        })
                 );
-        /**
-                 * .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Allow all requests (FOR TESTING ONLY!)
-                );*/
 
         return http.build();
     }
+
 }
