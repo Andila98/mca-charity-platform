@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/content")
+@RequestMapping("/api/v1/admin/content")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin(origins = {

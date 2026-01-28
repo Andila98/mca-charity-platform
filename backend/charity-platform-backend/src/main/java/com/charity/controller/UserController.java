@@ -6,7 +6,6 @@ import com.charity.dto.response.UserResponse;
 import com.charity.entity.User;
 import com.charity.exception.UserNotFoundException;
 import com.charity.mapper.UserMapper;
-import com.charity.repository.UserRepository;
 import com.charity.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +16,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     /**
      * Get all users
@@ -41,21 +39,8 @@ public class UserController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-
-        // Service already throws exception if null, so just call it directly
         User user = userService.getUserById(id);
         return ResponseEntity.ok(UserMapper.toResponse(user));
-
-        /**
-         *User user = userService.getUserById(id)
-                .orElse(null);
-
-         *if (user == null) {
-            return ResponseEntity.notFound().build()
-         }
-
-         *return ResponseEntity.ok(UserMapper.toResponse(user));
-        */
     }
 
     /**
@@ -63,21 +48,8 @@ public class UserController {
      */
     @GetMapping("/email/{email}")
     public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
-
         User user = userService.getUserByEmail(email);
         return ResponseEntity.ok(UserMapper.toResponse(user));
-
-        /**
-         *
-         * User user = userService.getUserByEmail(email)
-                .orElse(null);
-
-         *if (user == null) {
-            return ResponseEntity.notFound().build();
-         }
-
-         *return ResponseEntity.ok(UserMapper.toResponse(user));
-         */
     }
 
     /**
@@ -99,24 +71,12 @@ public class UserController {
     public ResponseEntity<?> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UserRequest request) {
-
-        // Service already throws exception if null, so just call it directly
+        
         User user = userService.getUserById(id);
-        return ResponseEntity.ok(UserMapper.toResponse(user));
-
-        /**
-         * User user = userService.getUserById(id)
-                .orElse(null);
-
-         if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         UserMapper.updateEntity(user, request);
-        User updatedUser = userService.updateUserProfile(id,user);
+        User updatedUser = userService.updateUserProfile(id, user);
 
         return ResponseEntity.ok(UserMapper.toResponse(updatedUser));
-        */
     }
 
     /**
@@ -124,23 +84,8 @@ public class UserController {
      */
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approveUser(@PathVariable Long id) {
-
-        // Service already throws exception if null, so just call it directly
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(UserMapper.toResponse(user));
-
-        /**
-         *User user = userService.getUserById(id)
-                .orElse(null);
-         if (user == null) {
-            return ResponseEntity.notFound().build();
-         }
-
-         user.setApproved(true);
-         User approvedUser = userService.updateUser(user);
-
-         return ResponseEntity.ok(UserMapper.toResponse(approvedUser));
-         */
+        User approvedUser = userService.approveUser(id);
+        return ResponseEntity.ok(UserMapper.toResponse(approvedUser));
     }
 
     /**

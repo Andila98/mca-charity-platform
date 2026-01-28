@@ -53,7 +53,7 @@ public class PageContent {
         updateCount = 0;
     }
 
-    @PrePersist
+    @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
         updateCount =  updateCount !=null? updateCount+1:1;
