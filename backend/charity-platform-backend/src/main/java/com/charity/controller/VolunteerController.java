@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/volunteers")
+@RequestMapping("/api/v1/volunteers")
 @RequiredArgsConstructor
 public class VolunteerController {
     private final VolunteerService volunteerService;

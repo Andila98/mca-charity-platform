@@ -21,6 +21,6 @@ public class UserResponse {
     private UserRole role;
     private String ward;
     private String profileImageUrl;
-    private Boolean approved;
+    private boolean approved;
     private LocalDateTime createdAt;
 }

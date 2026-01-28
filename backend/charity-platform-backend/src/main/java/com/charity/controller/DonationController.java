@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/donations")
+@RequestMapping("/api/v1/donations")
 @RequiredArgsConstructor
 public class DonationController {
 

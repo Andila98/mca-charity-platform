@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/images")
+@RequestMapping("/api/v1/admin/images")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin(origins = {
