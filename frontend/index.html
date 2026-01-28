@@ -7,9 +7,80 @@
     <title>Ajelo Foundation</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
+
+    <!-- ============================================================
+    ADMIN BAR (Yellow bar at top when in edit mode)
+    ============================================================ -->
+    <div class="admin-bar" id="adminBar">
+        <div class="admin-bar-content">
+            <span>📝 Admin Mode Active</span>
+            <small>Click any text to edit • Ctrl+Shift+A to toggle</small>
+        </div>
+        <div>
+            <button onclick="saveLandingPageChanges()" class="admin-btn save-btn">
+                💾 Save Changes
+            </button>
+            <button onclick="adminLogout()" class="admin-btn logout-btn">
+                🚪 Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+LOGIN MODAL (Overlay modal for admin login)
+============================================================ -->
+    <div class="modal" id="adminLoginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Admin Login</h2>
+                <button class="close-btn" onclick="closeAdminLogin()">&times;</button>
+            </div>
+
+            <div class="error-message" id="adminErrorMessage"></div>
+
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" name="username" placeholder="Enter admin username"
+                        autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" name="password" placeholder="Enter admin password"
+                        autocomplete="current-password" required>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-login" id="adminLoginSubmit">
+                        🔓 Login
+                    </button>
+                    <button type="button" class="btn-cancel" onclick="closeAdminLogin()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+
+            <div class="modal-footer">
+                <small>Keyboard shortcut: Ctrl+Shift+A</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+INLINE EDITOR (Popup editor for editing page content)
+============================================================ -->
+    <div class="inline-editor" id="inlineEditor">
+        <textarea id="editorContent" placeholder="Edit content here..."></textarea>
+        <div class="inline-editor-buttons">
+            <button class="save-btn" onclick="saveInlineEdit()">✅ Save</button>
+            <button class="cancel-btn" onclick="cancelInlineEdit()">❌ Cancel</button>
+        </div>
+    </div>
 
     <header class="header">
         <div class="container">
@@ -21,18 +92,29 @@
                 <a href="events.html">Events</a>
                 <a href="Volunteer.html">Volunteer</a>
                 <a href="Donate.html" class="btn-primary">Donate Now</a>
+
+                <!-- Admin link - hidden until logged out -->
+                <a href="#" id="adminLink" class="admin-link visible" onclick="openAdminLogin(); return false;">⚙️
+                    Admin</a>
+
+                <!-- Logout button - hidden until logged in -->
+                <button class="logout-btn" id="adminLogoutBtn" onclick="adminLogout()">🚪 Logout</button>
             </nav>
         </div>
     </header>
 
     <section class="hero">
         <div class="container hero-content">
-            <h1>Saving Lives Through Compassionate Medical Support</h1>
-            <p class="mission">We provide life-saving medical assistance to individuals and families who cannot afford
+            <h1 class="editable" data-key="hero-title">Saving Lives Through Compassionate Medical Support</h1>
+            <p class="mission" class="editable" data-key="hero-subtitle">We provide life-saving medical assistance to individuals and families who cannot afford
                 essential healthcare — ensuring no one is left behind due to financial hardship.</p>
             <div class="cta-buttons">
-                <a href="Donate.html" class="btn-primary large">Donate Now</a>
-                <a href="Volunteer.html" class="btn-secondary large">Become a Volunteer</a>
+                <a href="Donate.html" class="btn-primary large" >
+                    <span class="editable" data-key="btn-donate-text">Donate Now</span>
+                </a>
+                <a href="Volunteer.html" class="btn-secondary large">
+                    <span class="editable" data-key="btn-volunteer-text">Become a Volunteer</span>
+                </a>
             </div>
         </div>
         <div class="hero-image">
@@ -42,8 +124,8 @@
 
     <section id="who-we-are" class="section who-we-are">
         <div class="container">
-            <h2 class="section-title">Who We Are</h2>
-            <p class="intro-text">Ajelo Foundation is an organisation dedicated to bridging the gap in healthcare
+            <h2 class="section-title" class="editable" data-key="who-we-are-title">Who We Are</h2>
+            <p class="intro-text" class="editable" data-key="who-we-are-text">Ajelo Foundation is an organisation dedicated to bridging the gap in healthcare
                 access. We believe that quality medical care is a basic human right, not a privilege. Every day, we work
                 tirelessly to fund treatments,and ongoing care for those facing financial barriers — bringing hope and
                 healing to families in need.</p>
@@ -56,17 +138,17 @@
 
     <section id="what-we-do" class="section what-we-do">
         <div class="container">
-            <h2 class="section-title">What We Do</h2>
+            <h2 class="section-title" class="editable" data-key="what-we-do-title">What We Do</h2>
             <div class="cards">
                 <div class="card">
                     <img src="\images\Healthcare-Kenya.jpg" alt="Emergency medical team in action">
-                    <h3>Emergency Care Funding</h3>
-                    <p>We cover critical emergency treatments and hospital stays for patients in urgent need.</p>
+                    <h3 class="editable" data-key="what-we-do-card-subtitle">Emergency Care Funding</h3>
+                    <p class="editable" data-key="what-we-do-card-text">We cover critical emergency treatments and hospital stays for patients in urgent need.</p>
                 </div>
                 <div class="card">
                     <img src="\images\child with nurse.jfif" alt="Child receiving caring medical treatment">
-                    <h3>Treatment Support</h3>
-                    <p>Funding for ongoing therapies, medications, and specialist consultations.</p>
+                    <h3 class="editable" data-key="what-we-do-card-subtitle">Treatment Support</h3>
+                    <p class="editable" data-key="what-we-do-card-text">Funding for ongoing therapies, medications, and specialist consultations.</p>
                 </div>
 
             </div>
@@ -75,19 +157,19 @@
 
     <section id="impact" class="section impact-stats">
         <div class="container">
-            <h2 class="section-title">Our Impact</h2>
+            <h2 class="section-title" class="editable" data-key="impact-stats-title">Our Impact</h2>
             <div class="stats-grid">
                 <div class="stat">
-                    <h3>1,000+</h3>
-                    <p>Patients Supported</p>
+                    <h3 class="editable" data-key="stat-1-number">1,000+</h3>
+                    <p class="editable" data-key="stat-1-label">Patients Supported</p>
                 </div>
                 <div class="stat">
-                    <h3>500+</h3>
-                    <p>Medical Cases Funded</p>
+                    <h3 class="editable" data-key="stat-1-number">500+</h3>
+                    <p class="editable" data-key="stat-1-label">Medical Cases Funded</p>
                 </div>
                 <div class="stat">
-                    <h3>92%</h3>
-                    <p>Of Donations Directly to Programs</p>
+                    <h3 class="editable" data-key="stat-1-number">92%</h3>
+                    <p class="editable" data-key="stat-1-label">Of Donations Directly to Programs</p>
                 </div>
             </div>
         </div>
@@ -95,23 +177,23 @@
 
     <section class="section donation-impact">
         <div class="container">
-            <h2 class="section-title">Your Donation Makes a Real Difference</h2>
+            <h2 class="section-title" class="editable" data-key="donation-impact-title">Your Donation Makes a Real Difference</h2>
             <div class="cards">
                 <div class="card">
-                    <h3>$25</h3>
-                    <p>Provides a full medical consultation and basic diagnostics</p>
+                    <h3 class="editable" data-key="donation-impact-subtitle">$25</h3>
+                    <p class="editable" data-key="donation-impact-text">Provides a full medical consultation and basic diagnostics</p>
                 </div>
                 <div class="card">
-                    <h3>$100</h3>
-                    <p>Covers essential medications for one month</p>
+                    <h3 class="editable" data-key="donation-impact-subtitle">$100</h3>
+                    <p class="editable" data-key="donation-impact-text">Covers essential medications for one month</p>
                 </div>
                 <div class="card">
-                    <h3>$500</h3>
-                    <p>Funds emergency care or minor procedures</p>
+                    <h3 class="editable" data-key="donation-impact-subtitle">$500</h3>
+                    <p class="editable" data-key="donation-impact-text">Funds emergency care or minor procedures</p>
                 </div>
                 <div class="card">
-                    <h3>$2,000</h3>
-                    <p>Supports life-saving surgery for one patient</p>
+                    <h3 class="editable" data-key="donation-impact-subtitle">$2,000</h3>
+                    <p class="editable" data-key="donation-impact-text">Supports life-saving surgery for one patient</p>
                 </div>
             </div>
         </div>
@@ -119,8 +201,8 @@
 
     <section id="donate-now" class="section final-cta">
         <div class="container text-center">
-            <h2>Join Us in Bringing Hope and Healing</h2>
-            <p>Your support — whether through donation, volunteering, or sharing our mission — changes lives.</p>
+            <h2 class="editable" data-key="final-cta-title">Join Us in Bringing Hope and Healing</h2>
+            <p class="editable" data-key="final-cta-text">Your support — whether through donation, volunteering, or sharing our mission — changes lives.</p>
             <div class="cta-buttons">
                 <a href="Donate.html" class="btn-primary large">Donate Now</a>
                 <a href="Volunteer.html" class="btn-secondary large">Become a Volunteer</a>
@@ -133,11 +215,14 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 Ajelo Foundation. All rights reserved. </p>
+            <p class="editable" data-key="footer-text">&copy; 2026 Ajelo Foundation. All rights reserved. </p>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="js/admin-auth-service.js"></script>
+    <script src="js/admin-ui.js"></script>
+    <!-- Content Management System -->
+    <script src="js/content-manager.js"></script>
+    <script src="js/admin-content-editor.js"></script>
 </body>
-
 </html>

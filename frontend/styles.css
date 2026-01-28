@@ -7,6 +7,11 @@
     --text-dark: #333333;
     --text-light: #ffffff;
     --gray: #666666;
+    --admin-warning: #f39c12;
+    --admin-danger: #e74c3c;
+    --admin-success: #27ae60;
+    --admin-dark: #003366;
+    --admin-accent: #0077cc;
 }
 
 * {
@@ -134,12 +139,12 @@ body {
     width: 100%;
     max-width: 600px;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .section {
     padding: 5rem 0;
-    
+
 }
 
 .section-title {
@@ -171,7 +176,7 @@ body {
 .image-grid img {
     width: 100%;
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .cards {
@@ -184,7 +189,7 @@ body {
     background: white;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     text-align: center;
     transition: transform 0.3s;
 }
@@ -272,23 +277,603 @@ body {
     text-align: center;
 }
 
+/* ========== Admin Bar ========== */
+.admin-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(90deg, var(--admin-warning) 0%, #e67e22 100%);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-bar.active {
+    transform: translateY(0);
+}
+
+body.edit-mode-active {
+    margin-top: 70px;
+}
+
+.admin-bar-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    font-weight: 600;
+}
+
+.admin-bar-content span {
+    font-size: 1.1rem;
+}
+
+.admin-bar-content small {
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.admin-btn {
+    background: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    margin-left: 0.5rem;
+}
+
+.admin-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.admin-btn:active {
+    transform: scale(0.98);
+}
+
+/* ========== Login Modal ========== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 450px;
+    width: 90%;
+    animation: slideUp 0.3s ease;
+    position: relative;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    color: var(--admin-dark);
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--admin-dark);
+    transition: transform 0.2s;
+}
+
+.close-btn:hover {
+    transform: scale(1.2);
+}
+
+/* ========== Form Styles ========== */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--admin-dark);
+    font-size: 0.95rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.9rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    background: #f0f8ff;
+}
+
+.form-group input::placeholder {
+    color: #999;
+}
+
+/* ========== Error Message ========== */
+.error-message {
+    background: #ffebee;
+    color: var(--admin-danger);
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--admin-danger);
+    display: none;
+    font-weight: 500;
+}
+
+.error-message.show {
+    display: block;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ========== Modal Buttons ========== */
+.modal-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-login,
+.btn-cancel {
+    flex: 1;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.btn-login {
+    background: var(--admin-accent);
+    color: white;
+}
+
+.btn-login:hover {
+    background: #0060a3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 119, 204, 0.3);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.btn-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-cancel {
+    background: #e0e0e0;
+    color: var(--admin-dark);
+}
+
+.btn-cancel:hover {
+    background: #d0d0d0;
+    transform: translateY(-2px);
+}
+
+/* ========== Modal Footer ========== */
+.modal-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* ========== Navigation Links ========== */
+.admin-link {
+    display: none;
+    background: var(--admin-accent);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.admin-link.visible {
+    display: inline-block;
+}
+
+.admin-link:hover {
+    background: #0060a3;
+    transform: translateY(-2px);
+}
+
+.logout-btn {
+    display: none;
+    background: var(--admin-danger);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.logout-btn.visible {
+    display: inline-block;
+}
+
+.logout-btn:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* ========== Edit Mode Styles ========== */
+body.edit-mode-active .editable {
+    outline: 2px dashed var(--admin-accent);
+    outline-offset: 3px;
+    cursor: pointer;
+}
+
+body.edit-mode-active .editable:hover {
+    background: rgba(0, 119, 204, 0.05);
+}
+
+/* ========== Inline Editor ========== */
+.inline-editor {
+    display: none;
+    position: fixed;
+    background: white;
+    border: 2px solid var(--admin-accent);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 500;
+    min-width: 300px;
+    animation: slideUp 0.2s ease;
+}
+
+.inline-editor.active {
+    display: block;
+}
+
+.inline-editor textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.8rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    resize: vertical;
+    transition: all 0.3s;
+}
+
+.inline-editor textarea:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+}
+
+.inline-editor-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.inline-editor button {
+    flex: 1;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.inline-editor .save-btn {
+    background: var(--admin-success);
+    color: white;
+}
+
+.inline-editor .save-btn:hover {
+    background: #229954;
+    transform: translateY(-2px);
+}
+
+.inline-editor .cancel-btn {
+    background: #e0e0e0;
+    color: var(--admin-dark);
+}
+
+.inline-editor .cancel-btn:hover {
+    background: #d0d0d0;
+    transform: translateY(-2px);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .hero h1 {
         font-size: 2.8rem;
     }
+
     .cta-buttons {
         flex-direction: column;
         align-items: flex-start;
     }
+
     .hero {
         flex-direction: column;
         text-align: center;
     }
+
     .hero-content {
         margin-bottom: 2rem;
     }
+
+    /* ========== Modal Buttons ========== */
+    .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-login,
+    .btn-cancel {
+        flex: 1;
+        padding: 0.9rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;
+    }
+
+    .btn-login {
+        background: var(--admin-accent);
+        color: white;
+    }
+
+    .btn-login:hover {
+        background: #0060a3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 119, 204, 0.3);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-cancel {
+        background: #e0e0e0;
+        color: var(--admin-dark);
+    }
+
+    .btn-cancel:hover {
+        background: #d0d0d0;
+        transform: translateY(-2px);
+    }
+
+    /* ========== Modal Footer ========== */
+    .modal-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e0e0e0;
+        color: #666;
+        font-size: 0.85rem;
+    }
+
+    /* ========== Navigation Links ========== */
+    .admin-link {
+        display: none;
+        background: var(--admin-accent);
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .admin-link.visible {
+        display: inline-block;
+    }
+
+    .admin-link:hover {
+        background: #0060a3;
+        transform: translateY(-2px);
+    }
+
+    .logout-btn {
+        display: none;
+        background: var(--admin-danger);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .logout-btn.visible {
+        display: inline-block;
+    }
+
+    .logout-btn:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+
+    /* ========== Edit Mode Styles ========== */
+    body.edit-mode-active .editable {
+        outline: 2px dashed var(--admin-accent);
+        outline-offset: 3px;
+        cursor: pointer;
+    }
+
+    body.edit-mode-active .editable:hover {
+        background: rgba(0, 119, 204, 0.05);
+    }
+
+    /* ========== Inline Editor ========== */
+    .inline-editor {
+        display: none;
+        position: fixed;
+        background: white;
+        border: 2px solid var(--admin-accent);
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 500;
+        min-width: 300px;
+        animation: slideUp 0.2s ease;
+    }
+
+    .inline-editor.active {
+        display: block;
+    }
+
+    .inline-editor textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 0.8rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+        resize: vertical;
+        transition: all 0.3s;
+    }
+
+    .inline-editor textarea:focus {
+        outline: none;
+        border-color: var(--admin-accent);
+        box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    }
+
+    .inline-editor-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .inline-editor button {
+        flex: 1;
+        padding: 0.7rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .inline-editor .save-btn {
+        background: var(--admin-success);
+        color: white;
+    }
+
+    .inline-editor .save-btn:hover {
+        background: #229954;
+        transform: translateY(-2px);
+    }
+
+    .inline-editor .cancel-btn {
+        background: #e0e0e0;
+        color: var(--admin-dark);
+    }
+
+    .inline-editor .cancel-btn:hover {
+        background: #d0d0d0;
+        transform: translateY(-2px);
+    }
 }
+
 :root {
     --primary-blue: #005ea6;
     --dark-blue: #003366;
@@ -417,7 +1002,7 @@ form {
     background: white;
     padding: 3rem;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -431,7 +1016,8 @@ label {
     color: var(--dark-blue);
 }
 
-input, textarea {
+input,
+textarea {
     width: 100%;
     padding: 0.9rem;
     border: 2px solid #ddd;
@@ -441,7 +1027,8 @@ input, textarea {
     transition: border-color 0.3s;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
     outline: none;
     border-color: var(--medium-blue);
 }
@@ -461,7 +1048,7 @@ input:focus, textarea:focus {
     padding: 3rem;
     border-radius: 12px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     border-left: 6px solid var(--success-green);
 }
 
@@ -487,13 +1074,16 @@ input:focus, textarea:focus {
     .volunteer-hero h1 {
         font-size: 2.8rem;
     }
+
     form {
         padding: 2rem;
     }
+
     .header .container {
         flex-direction: column;
         gap: 1rem;
     }
+
     .nav a {
         margin: 0 1rem;
     }
