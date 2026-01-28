@@ -40,36 +40,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // Configure authorization
-                // Authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/api/v1/projects",
-                                "/api/v1/projects/**",
-                                "/api/v1/events",
-                                "/api/v1/events/**",
-                                "/api/v1/volunteers/register",
-                                "/api/v1/donations",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-
-                        // All other endpoints require authentication
-                        .anyRequest().authenticated()
-                )
-
-                // Exception handling
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(401);
-                            response.setContentType("application/json");
-                            response.getWriter().write(
-                                    "{\"error\": \"Unauthorized\", \"message\": \""
-                                            + authException.getMessage() + "\"}"
-                            );
-                        })
+                        .anyRequest().permitAll() // Allow all requests (FOR TESTING ONLY!)
                 );
 
         return http.build();
