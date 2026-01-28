@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Pagecontent" , indexes = {
+@Table(name = "pagecontent" , indexes = {
         @Index(name = "idx_content_key", columnList = "content_key"),
         @Index(name = "idx_page_name", columnList = "page_name")
 })
