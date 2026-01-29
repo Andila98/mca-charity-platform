@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Ajelo Foundation</title>
+    <link rel="stylesheet" href="../../../css/main.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/pages/admin/login.css">
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo">🏥</div>
+            <h1>Admin Portal</h1>
+            <p>Secure login for administrators</p>
+        </div>
+
+        <form id="admin-login-form" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="form-control"
+                        placeholder="Enter admin username"
+                        required
+                        autofocus
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="Enter admin password"
+                        required
+                >
+            </div>
+
+            <div class="error-message" id="login-error"></div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+                    Login to Dashboard
+                </button>
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            <p><a href="../../../index.html">← Back to Main Site</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Core Services -->
+<script src="../../../js/services/api.service.js"></script>
+<script src="../../../js/admin-auth-service.js"></script>
+<!-- Login Logic -->
+<script src="../../../js/pages/admin/login.js"></script>
+</body>
+</html>

@@ -119,7 +119,10 @@ class AdminUIController {
             console.log('✅ Login successful:', response);
             this.closeLoginModal();
             this.showAdminUI();
-            
+
+            // Redirect to dashboard
+            this.redirectToDashboard();
+
         } catch (error) {
             this.showError(error.message);
             // Clear password field
@@ -128,6 +131,26 @@ class AdminUIController {
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
+    }
+
+    /**
+     * Redirect to admin dashboard
+     * @private
+     */
+    redirectToDashboard() {
+        const path = window.location.pathname;
+        let dashboardPath = 'pages/admin/dashboard.html';
+
+        if (path.includes('/pages/')) {
+            dashboardPath = 'admin/dashboard.html';
+        }
+
+        // If we are already in admin folder (unlikely for this modal, but possible)
+        if (path.includes('/pages/admin/')) {
+            dashboardPath = 'dashboard.html';
+        }
+
+        window.location.href = dashboardPath;
     }
 
     /**
@@ -175,6 +198,12 @@ class AdminUIController {
             adminLink.classList.remove('visible');
         }
 
+        // Show image gallery if on page
+        const gallery = document.querySelector('.image-gallery-container');
+        if (gallery) {
+            gallery.style.display = 'block';
+        }
+
         console.log('📊 Admin UI shown');
     }
 
@@ -199,6 +228,12 @@ class AdminUIController {
         const adminLink = document.getElementById('adminLink');
         if (adminLink) {
             adminLink.classList.add('visible');
+        }
+
+        // Hide image gallery
+        const gallery = document.querySelector('.image-gallery-container');
+        if (gallery) {
+            gallery.style.display = 'none';
         }
 
         console.log('🔒 Admin UI hidden');
@@ -309,9 +344,19 @@ let adminUIController;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize services
-    adminAuthService = new AdminAuthService('http://localhost:8080/api');
+    // adminAPI is global from api.service.js
+    if (typeof adminAPI === 'undefined') {
+        console.error('CRITICAL: adminAPI not found. Check script loading order.');
+        return;
+    }
+
+    adminAuthService = new AdminAuthService(adminAPI);
     adminUIController = new AdminUIController(adminAuthService);
     adminUIController.init();
+
+    // Expose to global/window so other non-module scripts can access
+    window.adminAuthService = adminAuthService;
+    window.adminUIController = adminUIController;
 
     console.log('🚀 Admin authentication system initialized');
     console.log('💡 Tip: Press Ctrl+Shift+A to toggle admin mode');

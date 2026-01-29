@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Ajelo Foundation</title>
+    <link rel="stylesheet" href="../../css/pages/admin/dashboard.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo">🏥</div>
+            <h2>Ajelo Admin</h2>
+        </div>
+
+        <ul class="nav-menu">
+            <li><a href="#dashboard" class="nav-link active" onclick="switchTab('dashboard')">📊 Dashboard</a></li>
+            <li><a href="#projects" class="nav-link" onclick="switchTab('projects')">📋 Projects</a></li>
+            <li><a href="#volunteers" class="nav-link" onclick="switchTab('volunteers')">👥 Volunteers</a></li>
+            <li><a href="#events" class="nav-link" onclick="switchTab('events')">🎯 Events</a></li>
+            <li><a href="#donations" class="nav-link" onclick="switchTab('donations')">💰 Donations</a></li>
+            <li><a href="#users" class="nav-link" onclick="switchTab('users')">👤 Users</a></li>
+            <li><a href="#settings" class="nav-link" onclick="switchTab('settings')">⚙️ Settings</a></li>
+        </ul>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="userName">Admin User</div>
+                <div class="user-role" id="userRole">Administrator</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 id="pageTitle">Dashboard</h1>
+            <div class="header-info">
+                <span id="currentTime"></span>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <div class="stat-cards">
+                <div class="stat-card primary">
+                    <div class="stat-label">Active Projects</div>
+                    <div class="stat-value" id="projectCount">0</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-label">Registered Volunteers</div>
+                    <div class="stat-value" id="volunteerCount">0</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-label">Pending Donations</div>
+                    <div class="stat-value" id="donationCount">0</div>
+                </div>
+                <div class="stat-card error">
+                    <div class="stat-label">Upcoming Events</div>
+                    <div class="stat-value" id="eventCount">0</div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2 class="section-title">Recent Activity</h2>
+                <div id="activityList" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading activity...</p>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h2 class="section-title">Pending Approvals</h2>
+                <div id="pendingList" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading pending items...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects Tab -->
+        <div id="projects" class="tab-content" style="display:none;">
+            <div class="content-section">
+                <h2 class="section-title">Manage Projects</h2>
+                <div class="table-wrapper">
+                    <table id="projectsTable">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Ward</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsBody">
+                            <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Volunteers Tab -->
+        <div id="volunteers" class="tab-content" style="display:none;">
+            <div class="content-section">
+                <h2 class="section-title">Volunteer Management</h2>
+                <div class="table-wrapper">
+                    <table id="volunteersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Ward</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="volunteersBody">
+                            <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donations Tab -->
+        <div id="donations" class="tab-content" style="display:none;">
+            <div class="content-section">
+                <h2 class="section-title">Donation Management</h2>
+                <div class="table-wrapper">
+                    <table id="donationsTable">
+                        <thead>
+                            <tr>
+                                <th>Donor Name</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donationsBody">
+                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Tab -->
+        <div id="events" class="tab-content" style="display:none;">
+            <div class="content-section">
+                <h2 class="section-title">Event Management</h2>
+                <div class="table-wrapper">
+                    <table id="eventsTable">
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Location</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Attendees</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsBody">
+                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content" style="display:none;">
+            <div class="content-section">
+                <h2 class="section-title">User Management</h2>
+                <div class="table-wrapper">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody">
+                            <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content" style="display:none;">
+            <div class="content-section">
+                <h2 class="section-title">Settings</h2>
+                <p>Settings and configuration options will be available here.</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Core Services -->
+<script src="../../js/services/api.service.js"></script>
+<!-- Dashboard Logic -->
+<script src="../../js/pages/admin/dashboard.js"></script>
+
+</body>
+</html>
