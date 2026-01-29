@@ -28,13 +28,13 @@ public class CorsConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // ✅ SECURE: Only allow specific origins
-        configuration.setAllowedOrigins(allowedOrigins);
+        //configuration.setAllowedOrigins(allowedOrigins);
 
         // Alternative for development (more flexible but still secure):
-        // configuration.setAllowedOriginPatterns(Arrays.asList(
-        //     "http://localhost:[*]",
-        //     "http://127.0.0.1:[*]"
-        // ));
+         configuration.setAllowedOriginPatterns(Arrays.asList(
+             "http://localhost:[*]",
+             "http://127.0.0.1:[*]"
+         ));
 
         // Allow these HTTP methods
         configuration.setAllowedMethods(Arrays.asList(
