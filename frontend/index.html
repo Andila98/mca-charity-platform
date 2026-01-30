@@ -5,8 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajelo Foundation</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/image-management.css">
+    <link rel="stylesheet" href="css/responsive.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
@@ -21,13 +25,13 @@
             <small>Click any text to edit • Ctrl+Shift+A to toggle</small>
         </div>
         <div>
-            <button onclick="savePageChanges()" class="admin-btn save-btn">
+            <button id="saveChangesBtn" class="admin-btn save-btn">
                 💾 Save Changes
             </button>
-            <button onclick="openImageUploadModal()" class="btn-upload-image">
+            <button id="openImageUploadModalBtn" class="btn-upload-image">
                 📸 Upload Image
             </button>
-            <button onclick="adminLogout()" class="admin-btn logout-btn">
+            <button id="adminLogoutBtnTop" class="admin-btn logout-btn">
                 🚪 Logout
             </button>
         </div>
@@ -36,11 +40,11 @@
     <!-- ============================================================
     LOGIN MODAL (Overlay modal for admin login)
     ============================================================ -->
-    <div class="modal" id="adminLoginModal">
+    <div class="modal" id="adminLoginModal" role="dialog" aria-modal="true">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>🔐 Admin Login</h2>
-                <button class="close-btn" onclick="closeAdminLogin()">&times;</button>
+                <button class="close-btn" id="closeAdminLoginBtn">&times;</button>
             </div>
 
             <div class="error-message" id="adminErrorMessage"></div>
@@ -62,7 +66,7 @@
                     <button type="submit" class="btn-login" id="adminLoginSubmit">
                         🔓 Login
                     </button>
-                    <button type="button" class="btn-cancel" onclick="closeAdminLogin()">
+                    <button type="button" class="btn-cancel" id="cancelAdminLoginBtn">
                         Cancel
                     </button>
                 </div>
@@ -80,19 +84,19 @@
     <div class="inline-editor" id="inlineEditor">
         <textarea id="editorContent" placeholder="Edit content here..."></textarea>
         <div class="inline-editor-buttons">
-            <button class="save-btn" onclick="saveInlineEdit()">✅ Save</button>
-            <button class="cancel-btn" onclick="cancelInlineEdit()">❌ Cancel</button>
+            <button class="save-btn" id="saveInlineEditBtn">✅ Save</button>
+            <button class="cancel-btn" id="cancelInlineEditBtn">❌ Cancel</button>
         </div>
     </div>
 
     <!-- ============================================================
     IMAGE UPLOAD MODAL
     ============================================================ -->
-    <div class="modal" id="imageUploadModal">
+    <div class="modal" id="imageUploadModal" role="dialog" aria-modal="true">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>📸 Upload Image</h2>
-                <button class="close-btn" onclick="closeImageUploadModal()">&times;</button>
+                <button class="close-btn" id="closeImageUploadModalBtn">&times;</button>
             </div>
 
             <!-- Drag and Drop Zone -->
@@ -163,10 +167,10 @@
 
             <!-- Modal Buttons -->
             <div class="modal-buttons">
-                <button onclick="confirmImageUpload()" class="btn-upload">
+                <button id="confirmImageUploadBtn" class="btn-upload">
                     ⬆️ Upload
                 </button>
-                <button onclick="closeImageUploadModal()" class="btn-cancel">
+                <button id="cancelImageUploadBtn" class="btn-cancel">
                     Cancel
                 </button>
             </div>
@@ -203,11 +207,11 @@
                 <a href="pages/donate.html" class="btn-primary">Donate Now</a>
 
                 <!-- Admin link - hidden until logged out -->
-                <a href="#" id="adminLink" class="admin-link visible" onclick="openAdminLogin(); return false;">⚙️
+                <a href="#" id="adminLink" class="admin-link visible">⚙️
                     Admin</a>
 
                 <!-- Logout button - hidden until logged in -->
-                <button class="logout-btn" id="adminLogoutBtn" onclick="adminLogout()">🚪 Logout</button>
+                <button class="logout-btn" id="adminLogoutBtn">🚪 Logout</button>
             </nav>
         </div>
     </header>
@@ -227,7 +231,7 @@
             </div>
         </div>
         <div class="hero-image">
-            <img src="images/compassionate.jfif" alt="Doctor providing compassionate care to patient">
+            <img src="images/compassionate.webp" alt="Doctor providing compassionate care to patient" loading="lazy">
         </div>
     </section>
 
@@ -239,8 +243,8 @@
                 tirelessly to fund treatments,and ongoing care for those facing financial barriers — bringing hope and
                 healing to families in need.</p>
             <div class="image-grid">
-                <img src="images/receiving treatment.jfif" alt="Ailing child receiving treatment">
-                <img src="images/impaired child.jfif" alt="We cater for all">
+                <img src="images/receiving treatment.webp" alt="Ailing child receiving treatment" loading="lazy">
+                <img src="images/impaired child.webp" alt="We cater for all" loading="lazy">
             </div>
         </div>
     </section>
@@ -250,14 +254,14 @@
             <h2 class="section-title editable" data-key="what-we-do-title">What We Do</h2>
             <div class="cards">
                 <div class="card">
-                    <img src="images/Healthcare-Kenya.jpg" alt="Emergency medical team in action">
-                    <h3 class="editable" data-key="what-we-do-card-subtitle">Emergency Care Funding</h3>
-                    <p class="editable" data-key="what-we-do-card-text">We cover critical emergency treatments and hospital stays for patients in urgent need.</p>
+                    <img src="images/Healthcare-Kenya.jpg" alt="Emergency medical team in action" loading="lazy">
+                    <h3 class="editable" data-key="what-we-do-card-1-subtitle">Emergency Care Funding</h3>
+                    <p class="editable" data-key="what-we-do-card-1-text">We cover critical emergency treatments and hospital stays for patients in urgent need.</p>
                 </div>
                 <div class="card">
-                    <img src="images/child with nurse.jfif" alt="Child receiving caring medical treatment">
-                    <h3 class="editable" data-key="what-we-do-card-subtitle">Treatment Support</h3>
-                    <p class="editable" data-key="what-we-do-card-text">Funding for ongoing therapies, medications, and specialist consultations.</p>
+                    <img src="images/child with nurse.webp" alt="Child receiving caring medical treatment" loading="lazy">
+                    <h3 class="editable" data-key="what-we-do-card-2-subtitle">Treatment Support</h3>
+                    <p class="editable" data-key="what-we-do-card-2-text">Funding for ongoing therapies, medications, and specialist consultations.</p>
                 </div>
 
             </div>
@@ -269,16 +273,16 @@
             <h2 class="section-title editable" data-key="impact-stats-title">Our Impact</h2>
             <div class="stats-grid">
                 <div class="stat">
-                    <h3 class="editable" data-key="stat-1-number">1,000+</h3>
-                    <p class="editable" data-key="stat-1-label">Patients Supported</p>
+                    <h3 class="editable" data-key="stat-patients-number">1,000+</h3>
+                    <p class="editable" data-key="stat-patients-label">Patients Supported</p>
                 </div>
                 <div class="stat">
-                    <h3 class="editable" data-key="stat-1-number">500+</h3>
-                    <p class="editable" data-key="stat-1-label">Medical Cases Funded</p>
+                    <h3 class="editable" data-key="stat-cases-number">500+</h3>
+                    <p class="editable" data-key="stat-cases-label">Medical Cases Funded</p>
                 </div>
                 <div class="stat">
-                    <h3 class="editable" data-key="stat-1-number">92%</h3>
-                    <p class="editable" data-key="stat-1-label">Of Donations Directly to Programs</p>
+                    <h3 class="editable" data-key="stat-efficiency-number">92%</h3>
+                    <p class="editable" data-key="stat-efficiency-label">Of Donations Directly to Programs</p>
                 </div>
             </div>
         </div>
@@ -289,20 +293,20 @@
             <h2 class="section-title editable" data-key="donation-impact-title">Your Donation Makes a Real Difference</h2>
             <div class="cards">
                 <div class="card">
-                    <h3 class="editable" data-key="donation-impact-subtitle">$25</h3>
-                    <p class="editable" data-key="donation-impact-text">Provides a full medical consultation and basic diagnostics</p>
+                    <h3 class="editable" data-key="donation-impact-card-1-subtitle">$25</h3>
+                    <p class="editable" data-key="donation-impact-card-1-text">Provides a full medical consultation and basic diagnostics</p>
                 </div>
                 <div class="card">
-                    <h3 class="editable" data-key="donation-impact-subtitle">$100</h3>
-                    <p class="editable" data-key="donation-impact-text">Covers essential medications for one month</p>
+                    <h3 class="editable" data-key="donation-impact-card-2-subtitle">$100</h3>
+                    <p class="editable" data-key="donation-impact-card-2-text">Covers essential medications for one month</p>
                 </div>
                 <div class="card">
-                    <h3 class="editable" data-key="donation-impact-subtitle">$500</h3>
-                    <p class="editable" data-key="donation-impact-text">Funds emergency care or minor procedures</p>
+                    <h3 class="editable" data-key="donation-impact-card-3-subtitle">$500</h3>
+                    <p class="editable" data-key="donation-impact-card-3-text">Funds emergency care or minor procedures</p>
                 </div>
                 <div class="card">
-                    <h3 class="editable" data-key="donation-impact-subtitle">$2,000</h3>
-                    <p class="editable" data-key="donation-impact-text">Supports life-saving surgery for one patient</p>
+                    <h3 class="editable" data-key="donation-impact-card-4-subtitle">$2,000</h3>
+                    <p class="editable" data-key="donation-impact-card-4-text">Supports life-saving surgery for one patient</p>
                 </div>
             </div>
         </div>
@@ -318,7 +322,7 @@
             </div>
         </div>
         <div class="final-image">
-            <img src="images/final.jfif" alt="Nurse caring for smiling child patient">
+            <img src="images/final.webp" alt="Nurse caring for smiling child patient" loading="lazy">
         </div>
     </section>
 

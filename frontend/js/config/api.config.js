@@ -1,11 +1,28 @@
-**
+/**
  * API Configuration
  * Central configuration for all API endpoints
  */
 
+/**
+ * Get environment-specific API URL
+ * @returns {string} API base URL
+ */
+function getAPIBaseURL() {
+    // Check if we're in development, staging, or production
+    const hostname = window.location.hostname;
+
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:8080/api';
+    } else if (hostname.includes('staging')) {
+        return 'https://api-staging.ajelofoundation.org/api';
+    } else {
+        return 'https://api.ajelofoundation.org/api';
+    }
+}
+
 const API_CONFIG = {
     // Base configuration
-    BASE_URL: 'http://localhost:8080/api',
+    BASE_URL: getAPIBaseURL(),
     VERSION: 'v1',
     TIMEOUT: 10000, // 10 seconds
     RETRY_ATTEMPTS: 3,
@@ -101,23 +118,6 @@ const API_CONFIG = {
  */
 function getFullURL(endpoint) {
     return `${API_CONFIG.BASE_URL}/${API_CONFIG.VERSION}${endpoint}`;
-}
-
-/**
- * Get environment-specific API URL
- * @returns {string} API base URL
- */
-function getAPIBaseURL() {
-    // Check if we're in development, staging, or production
-    const hostname = window.location.hostname;
-    
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return 'http://localhost:8080/api';
-    } else if (hostname.includes('staging')) {
-        return 'https://api-staging.ajelofoundation.org/api';
-    } else {
-        return 'https://api.ajelofoundation.org/api';
-    }
 }
 
 // Export for use in modules

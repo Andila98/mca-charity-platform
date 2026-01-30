@@ -77,21 +77,6 @@ class ProjectService {
     }
 
     /**
-     * Get projects by date range
-     */
-    static async getByDateRange(startDate, endDate) {
-        try {
-            const response = await apiService.get(API_CONFIG.ENDPOINTS.PROJECTS.DATE_RANGE, {
-                startDate,
-                endDate
-            });
-            return response;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
      * Update project
      */
     static async update(id, projectData) {

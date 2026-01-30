@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Donations - Admin Panel</title>
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/pages/admin/admin.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+</head>
+<body class="admin-layout">
+<!-- Sidebar -->
+<aside id="admin-sidebar" class="admin-sidebar">
+    <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+        <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">Dashboard</span>
+        </a>
+        <a href="projects.html" class="nav-item">
+            <span class="nav-icon">📁</span>
+            <span class="nav-text">Projects</span>
+        </a>
+        <a href="events.html" class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span class="nav-text">Events</span>
+        </a>
+        <a href="donations.html" class="nav-item active">
+            <span class="nav-icon">💰</span>
+            <span class="nav-text">Donations</span>
+        </a>
+        <a href="volunteers.html" class="nav-item">
+            <span class="nav-icon">🤝</span>
+            <span class="nav-text">Volunteers</span>
+        </a>
+        <a href="users.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span class="nav-text">Users</span>
+        </a>
+        <a href="content.html" class="nav-item">
+            <span class="nav-icon">📝</span>
+            <span class="nav-text">Content</span>
+        </a>
+        <a href="activity.html" class="nav-item">
+            <span class="nav-icon">📜</span>
+            <span class="nav-text">Activity Logs</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-text">Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-secondary btn-block">Logout</button>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main class="admin-main">
+    <header class="admin-header">
+        <div class="header-left">
+            <h1>Manage Donations</h1>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-secondary" id="export-donations-btn">
+                📊 Export
+            </button>
+        </div>
+    </header>
+
+    <div class="admin-content">
+        <!-- Stats Cards -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">💰</span>
+                    <span class="stat-label">Total Cash Donations</span>
+                </div>
+                <div class="stat-value" id="total-cash">KES 0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">📦</span>
+                    <span class="stat-label">Item Donations</span>
+                </div>
+                <div class="stat-value" id="total-items">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">🛠️</span>
+                    <span class="stat-label">Service Donations</span>
+                </div>
+                <div class="stat-value" id="total-services">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">⏳</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+                <div class="stat-value" id="total-pending">0</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <section class="admin-card">
+            <div class="card-body">
+                <div class="filters-wrapper">
+                    <div class="filter-group">
+                        <label for="status-filter">Status:</label>
+                        <select id="status-filter" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="RECEIVED">Received</option>
+                            <option value="USED">Used</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="type-filter">Type:</label>
+                        <select id="type-filter" class="form-control">
+                            <option value="">All Types</option>
+                            <option value="CASH">Cash</option>
+                            <option value="ITEM">Item</option>
+                            <option value="SERVICE">Service</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="project-filter">Project:</label>
+                        <select id="project-filter" class="form-control">
+                            <option value="">All Projects</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="search-input">Search:</label>
+                        <input type="text" id="search-input" class="form-control" placeholder="Search by donor...">
+                    </div>
+
+                    <div class="filter-group">
+                        <button id="reset-filters" class="btn btn-secondary">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Donations Table -->
+        <section class="admin-card">
+            <div class="card-header">
+                <h3>All Donations (<span id="donation-count">0</span>)</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Donor Name</th>
+                            <th>Type</th>
+                            <th>Amount/Description</th>
+                            <th>Status</th>
+                            <th>Project</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="donations-tbody">
+                        <!-- Donations will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Status Update Modal -->
+<div id="status-modal" class="modal" style="display: none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Donation Status</h3>
+                <button class="modal-close" id="status-modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="status-donation-id">
+
+                <div class="form-group">
+                    <label>Donor: <strong id="status-donor-name"></strong></label>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Status: <span id="status-current"></span></label>
+                </div>
+
+                <div class="form-group">
+                    <label for="new-status">New Status <span class="required">*</span></label>
+                    <select id="new-status" class="form-control">
+                        <option value="PENDING">Pending</option>
+                        <option value="RECEIVED">Received</option>
+                        <option value="USED">Used</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="status-notes">Notes</label>
+                    <textarea id="status-notes" class="form-control" rows="3" placeholder="Add any notes about this status change..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="status-cancel-btn">Cancel</button>
+                <button class="btn btn-primary" id="status-save-btn">Update Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="../../js/services/api.service.js"></script>
+<script src="../../js/pages/admin/donations.js"></script>
+</body>
+</html>

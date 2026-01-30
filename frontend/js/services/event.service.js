@@ -65,28 +65,11 @@ class EventService {
     }
 
     /**
-     * Get events by date range
-     */
-    static async getByDateRange(startDate, endDate) {
-        try {
-            const response = await apiService.get(API_CONFIG.ENDPOINTS.EVENTS.DATE_RANGE, {
-                startDate,
-                endDate
-            });
-            return response;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
      * Register volunteer for event
      */
     static async registerVolunteer(eventId, volunteerId) {
         try {
-            const response = await apiService.post(API_CONFIG.ENDPOINTS.EVENTS.REGISTER_VOLUNTEER(eventId), {
-                volunteerId
-            });
+            const response = await apiService.post(API_CONFIG.ENDPOINTS.EVENTS.REGISTER_VOLUNTEER(eventId, volunteerId));
             return response;
         } catch (error) {
             throw error;

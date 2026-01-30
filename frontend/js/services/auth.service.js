@@ -8,6 +8,7 @@ class AuthService {
         this.api = apiService;
         this.currentUser = null;
         this.TOKEN_KEY = 'auth_token';
+        this.ADMIN_TOKEN_KEY = 'admin_auth_token';
         this.USER_KEY = 'user_data';
     }
 
@@ -53,7 +54,7 @@ class AuthService {
             );
 
             // Store authentication data
-            this.storeAuthData(response);
+            this.storeAuthData(response, false);
 
             console.log('✅ Login successful:', response.email);
             return response;
@@ -82,7 +83,7 @@ class AuthService {
             );
 
             // Store authentication data
-            this.storeAuthData(response);
+            this.storeAuthData(response, true);
 
             console.log('✅ Admin login successful:', response.email);
             return response;
@@ -99,6 +100,7 @@ class AuthService {
     logout() {
         // Clear all auth-related data
         StorageUtil.remove(this.TOKEN_KEY);
+        StorageUtil.remove(this.ADMIN_TOKEN_KEY);
         StorageUtil.remove(this.USER_KEY);
         this.currentUser = null;
 
@@ -113,8 +115,15 @@ class AuthService {
      * @returns {boolean}
      */
     isAuthenticated() {
-        const token = StorageUtil.get(this.TOKEN_KEY);
-        return !!token;
+        const token = this.getToken();
+        if (!token) return false;
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp * 1000 > Date.now();
+        } catch {
+            return false;
+        }
     }
 
     /**
@@ -133,7 +142,7 @@ class AuthService {
      * @returns {string|null} JWT token or null
      */
     getToken() {
-        return StorageUtil.get(this.TOKEN_KEY);
+        return StorageUtil.get(this.ADMIN_TOKEN_KEY) || StorageUtil.get(this.TOKEN_KEY);
     }
 
     /**
@@ -167,9 +176,9 @@ class AuthService {
      */
     requireAuth() {
         if (!this.isAuthenticated()) {
-            // Store current page to redirect back after login
             StorageUtil.set('redirect_after_login', window.location.pathname);
-            window.location.href = '/login.html';
+            const isAdminRoute = window.location.pathname.includes('/admin');
+            window.location.href = isAdminRoute ? '/pages/admin/login.html' : '/login.html';
         }
     }
 
@@ -210,14 +219,17 @@ class AuthService {
     /**
      * Store authentication data
      * @param {object} authData - Authentication response
+     * @param {boolean} isAdmin - Whether the login is for an admin
      * @private
      */
-    storeAuthData(authData) {
+    storeAuthData(authData, isAdmin = false) {
         // Store token
-        StorageUtil.set(this.TOKEN_KEY, authData.token);
+        const tokenKey = isAdmin ? this.ADMIN_TOKEN_KEY : this.TOKEN_KEY;
+        StorageUtil.set(tokenKey, authData.token);
 
         // Store user data
         const userData = {
+            id: authData.id, // Store ID
             email: authData.email,
             fullName: authData.fullName,
             role: authData.role
@@ -264,11 +276,11 @@ class AuthService {
     async updateProfile(profileData) {
         try {
             const user = this.getCurrentUser();
-            if (!user) throw new Error('User not authenticated');
+            if (!user || !user.id) throw new Error('User not authenticated');
 
-            // Call API to update profile (you need to implement this endpoint)
+            // Call API to update profile using ID
             const response = await this.api.put(
-                API_CONFIG.ENDPOINTS.USERS.BY_EMAIL(user.email),
+                API_CONFIG.ENDPOINTS.USERS.BY_ID(user.id),
                 profileData
             );
 
@@ -283,38 +295,6 @@ class AuthService {
         } catch (error) {
             console.error('❌ Profile update failed:', error.message);
             throw new Error(`Profile update failed: ${error.message}`);
-        }
-    }
-
-    /**
-     * Change password
-     * @param {string} currentPassword - Current password
-     * @param {string} newPassword - New password
-     * @returns {Promise<object>} Response
-     */
-    async changePassword(currentPassword, newPassword) {
-        try {
-            // Validate passwords
-            if (!currentPassword || !newPassword) {
-                throw new Error('Current and new password are required');
-            }
-
-            if (newPassword.length < 6) {
-                throw new Error('New password must be at least 6 characters');
-            }
-
-            // Call API (you need to implement this endpoint)
-            const response = await this.api.post('/auth/change-password', {
-                currentPassword,
-                newPassword
-            });
-
-            console.log('✅ Password changed successfully');
-            return response;
-
-        } catch (error) {
-            console.error('❌ Password change failed:', error.message);
-            throw new Error(`Password change failed: ${error.message}`);
         }
     }
 }
