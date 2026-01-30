@@ -3,216 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Ajelo Foundation</title>
-    <link rel="stylesheet" href="../../css/pages/admin/dashboard.css">
+    <title>Admin Dashboard - Charity Platform</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/pages/admin.css">
 </head>
-<body>
+<body class="admin-layout">
+<!-- Admin Sidebar -->
+<aside id="admin-sidebar" class="admin-sidebar">
+    <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+        <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
+    </div>
 
-<div class="dashboard-container">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <div class="logo">🏥</div>
-            <h2>Ajelo Admin</h2>
+    <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">Dashboard</span>
+        </a>
+        <a href="projects.html" class="nav-item">
+            <span class="nav-icon">📁</span>
+            <span class="nav-text">Projects</span>
+        </a>
+        <a href="events.html" class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span class="nav-text">Events</span>
+        </a>
+        <a href="donations.html" class="nav-item">
+            <span class="nav-icon">💰</span>
+            <span class="nav-text">Donations</span>
+        </a>
+        <a href="volunteers.html" class="nav-item">
+            <span class="nav-icon">🤝</span>
+            <span class="nav-text">Volunteers</span>
+        </a>
+        <a href="users.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span class="nav-text">Users</span>
+        </a>
+        <a href="content.html" class="nav-item">
+            <span class="nav-icon">📝</span>
+            <span class="nav-text">Content</span>
+        </a>
+        <a href="activity.html" class="nav-item">
+            <span class="nav-icon">📜</span>
+            <span class="nav-text">Activity Logs</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-text">Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-secondary btn-block">
+            Logout
+        </button>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main class="admin-main">
+    <!-- Top Bar -->
+    <header class="admin-header">
+        <div class="header-left">
+            <h1>Dashboard</h1>
         </div>
-
-        <ul class="nav-menu">
-            <li><a href="#dashboard" class="nav-link active" onclick="switchTab('dashboard')">📊 Dashboard</a></li>
-            <li><a href="#projects" class="nav-link" onclick="switchTab('projects')">📋 Projects</a></li>
-            <li><a href="#volunteers" class="nav-link" onclick="switchTab('volunteers')">👥 Volunteers</a></li>
-            <li><a href="#events" class="nav-link" onclick="switchTab('events')">🎯 Events</a></li>
-            <li><a href="#donations" class="nav-link" onclick="switchTab('donations')">💰 Donations</a></li>
-            <li><a href="#users" class="nav-link" onclick="switchTab('users')">👤 Users</a></li>
-            <li><a href="#settings" class="nav-link" onclick="switchTab('settings')">⚙️ Settings</a></li>
-        </ul>
-
-        <div class="user-section">
+        <div class="header-right">
             <div class="user-info">
-                <div class="user-name" id="userName">Admin User</div>
-                <div class="user-role" id="userRole">Administrator</div>
-            </div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="header">
-            <h1 id="pageTitle">Dashboard</h1>
-            <div class="header-info">
-                <span id="currentTime"></span>
+                <span id="user-name">Loading...</span>
+                <span id="user-role" class="user-role"></span>
             </div>
         </div>
+    </header>
 
-        <!-- Dashboard Tab -->
-        <div id="dashboard" class="tab-content">
-            <div class="stat-cards">
-                <div class="stat-card primary">
-                    <div class="stat-label">Active Projects</div>
-                    <div class="stat-value" id="projectCount">0</div>
+    <!-- Dashboard Content -->
+    <div class="admin-content">
+        <!-- Stats Grid -->
+        <section class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">👥</span>
+                    <span class="stat-label">Total Users</span>
                 </div>
-                <div class="stat-card success">
-                    <div class="stat-label">Registered Volunteers</div>
-                    <div class="stat-value" id="volunteerCount">0</div>
-                </div>
-                <div class="stat-card warning">
-                    <div class="stat-label">Pending Donations</div>
-                    <div class="stat-value" id="donationCount">0</div>
-                </div>
-                <div class="stat-card error">
-                    <div class="stat-label">Upcoming Events</div>
-                    <div class="stat-value" id="eventCount">0</div>
+                <div class="stat-value" id="total-users">0</div>
+                <div class="stat-details">
+                    <span id="pending-users">0 pending approval</span>
                 </div>
             </div>
 
-            <div class="content-section">
-                <h2 class="section-title">Recent Activity</h2>
-                <div id="activityList" class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading activity...</p>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">📁</span>
+                    <span class="stat-label">Projects</span>
+                </div>
+                <div class="stat-value" id="total-projects">0</div>
+                <div class="stat-details">
+                    <span id="ongoing-projects">0 ongoing</span>
                 </div>
             </div>
 
-            <div class="content-section">
-                <h2 class="section-title">Pending Approvals</h2>
-                <div id="pendingList" class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading pending items...</p>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">💰</span>
+                    <span class="stat-label">Donations</span>
+                </div>
+                <div class="stat-value" id="total-donations">KES 0</div>
+                <div class="stat-details">
+                    <span id="pending-donations">0 pending</span>
                 </div>
             </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">🤝</span>
+                    <span class="stat-label">Volunteers</span>
+                </div>
+                <div class="stat-value" id="total-volunteers">0</div>
+                <div class="stat-details">
+                    <span id="active-volunteers">0 active</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Row -->
+        <div class="grid-2">
+            <!-- Pending Approvals -->
+            <section class="card">
+                <div class="card-header">
+                    <h3>Pending Approvals</h3>
+                    <button class="btn btn-sm btn-primary" onclick="window.location.href='users.html'">
+                        View All
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="pending-approvals-list" class="approval-list">
+                        <!-- Pending approvals will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="card">
+                <div class="card-header">
+                    <h3>Recent Activity</h3>
+                    <button class="btn btn-sm btn-secondary" onclick="window.location.href='activity.html'">
+                        View All
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="recent-activity-list" class="activity-list">
+                        <!-- Recent activity will be loaded here -->
+                    </div>
+                </div>
+            </section>
         </div>
 
-        <!-- Projects Tab -->
-        <div id="projects" class="tab-content" style="display:none;">
-            <div class="content-section">
-                <h2 class="section-title">Manage Projects</h2>
-                <div class="table-wrapper">
-                    <table id="projectsTable">
-                        <thead>
-                            <tr>
-                                <th>Project Name</th>
-                                <th>Ward</th>
-                                <th>Status</th>
-                                <th>Progress</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="projectsBody">
-                            <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
-                        </tbody>
-                    </table>
+        <!-- Quick Actions -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Quick Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="window.location.href='projects.html?action=create'">
+                        <span class="action-icon">➕</span>
+                        <span>Create Project</span>
+                    </button>
+                    <button class="action-btn" onclick="window.location.href='events.html?action=create'">
+                        <span class="action-icon">📅</span>
+                        <span>Create Event</span>
+                    </button>
+                    <button class="action-btn" id="backup-btn">
+                        <span class="action-icon">💾</span>
+                        <span>Backup Data</span>
+                    </button>
+                    <button class="action-btn" id="export-btn">
+                        <span class="action-icon">📊</span>
+                        <span>Export Reports</span>
+                    </button>
                 </div>
             </div>
-        </div>
+        </section>
+    </div>
+</main>
 
-        <!-- Volunteers Tab -->
-        <div id="volunteers" class="tab-content" style="display:none;">
-            <div class="content-section">
-                <h2 class="section-title">Volunteer Management</h2>
-                <div class="table-wrapper">
-                    <table id="volunteersTable">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Ward</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="volunteersBody">
-                            <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Donations Tab -->
-        <div id="donations" class="tab-content" style="display:none;">
-            <div class="content-section">
-                <h2 class="section-title">Donation Management</h2>
-                <div class="table-wrapper">
-                    <table id="donationsTable">
-                        <thead>
-                            <tr>
-                                <th>Donor Name</th>
-                                <th>Amount</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="donationsBody">
-                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Events Tab -->
-        <div id="events" class="tab-content" style="display:none;">
-            <div class="content-section">
-                <h2 class="section-title">Event Management</h2>
-                <div class="table-wrapper">
-                    <table id="eventsTable">
-                        <thead>
-                            <tr>
-                                <th>Event Name</th>
-                                <th>Location</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Attendees</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="eventsBody">
-                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Users Tab -->
-        <div id="users" class="tab-content" style="display:none;">
-            <div class="content-section">
-                <h2 class="section-title">User Management</h2>
-                <div class="table-wrapper">
-                    <table id="usersTable">
-                        <thead>
-                            <tr>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersBody">
-                            <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Tab -->
-        <div id="settings" class="tab-content" style="display:none;">
-            <div class="content-section">
-                <h2 class="section-title">Settings</h2>
-                <p>Settings and configuration options will be available here.</p>
-            </div>
-        </div>
-    </main>
-</div>
-
-<!-- Core Services -->
-<script src="../../js/services/api.service.js"></script>
-<!-- Dashboard Logic -->
-<script src="../../js/pages/admin/dashboard.js"></script>
-
+<!-- Scripts -->
+<script src="../../js/config/api.config.js"></script>
+<script src="../../js/utils/storage.js"></script>
+<script src="../../js/utils/validation.js"></script>
+<script src="../../js/utils/format.js"></script>
+<script src="../../js/utils/error-handler.js"></script>
+<script src="../../js/components/toast.js"></script>
+<script src="../../js/components/loader.js"></script>
+<script src="../../js/components/modal.js"></script>
+<script src="../../js/services/api-service.js"></script>
+<script src="../../js/services/auth.service.js"></script>
+<script src="../../js/services/project.service.js"></script>
+<script src="../../js/services/event.service.js"></script>
+<script src="../../js/services/donation.service.js"></script>
+<script src="../../js/services/volunteer.service.js"></script>
+<script src="../../js/services/admin.service.js"></script>
+<script src="../../js/pages/admin/dashboard.page.js"></script>
 </body>
 </html>

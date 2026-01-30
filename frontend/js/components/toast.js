@@ -89,3 +89,11 @@ toastStyles.textContent = `
     }
 `;
 document.head.appendChild(toastStyles);
+
+// Alias for easier use
+const Toast = ToastNotification;
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { ToastNotification, Toast };
+}

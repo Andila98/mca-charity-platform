@@ -65,6 +65,35 @@ class AuthService {
     }
 
     /**
+     * Login admin user
+     * @param {object} credentials - Login credentials
+     * @returns {Promise<object>} Login response with token
+     */
+    async adminLogin(credentials) {
+        try {
+            // Validate credentials
+            if (!credentials.email || !credentials.password) {
+                throw new Error('Email and password are required');
+            }
+
+            const response = await this.api.post(
+                API_CONFIG.ENDPOINTS.ADMIN_AUTH.LOGIN,
+                credentials
+            );
+
+            // Store authentication data
+            this.storeAuthData(response);
+
+            console.log('✅ Admin login successful:', response.email);
+            return response;
+
+        } catch (error) {
+            console.error('❌ Admin login failed:', error.message);
+            throw new Error(`Admin login failed: ${error.message}`);
+        }
+    }
+
+    /**
      * Logout user
      */
     logout() {
@@ -155,6 +184,13 @@ class AuthService {
             alert('You do not have permission to access this page');
             window.location.href = '/index.html';
         }
+    }
+
+    /**
+     * Require admin role (redirect if user is not an admin)
+     */
+    requireAdmin() {
+        this.requireRole('ADMIN');
     }
 
     /**

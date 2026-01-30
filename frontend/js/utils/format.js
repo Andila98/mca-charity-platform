@@ -1,4 +1,4 @@
-**
+/**
  * Format Utility
  * Formatting helpers for dates, currency, etc.
  */
@@ -183,8 +183,7 @@ const FormatUtil = {
     }
 };
 
-
-
-
-
-
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { FormatUtil };
+}
