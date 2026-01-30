@@ -20,8 +20,8 @@ class AdminService {
             return {
                 users: {
                     total: users.length,
-                    pending: users.filter(u => !u.isApproved).length,
-                    approved: users.filter(u => u.isApproved).length,
+                    pending: users.filter(u => !u.approved).length,
+                    approved: users.filter(u => u.approved).length,
                     admins: users.filter(u => u.role === 'ADMIN').length,
                     editors: users.filter(u => u.role === 'EDITOR').length,
                     viewers: users.filter(u => u.role === 'VIEWER').length
@@ -74,7 +74,7 @@ class AdminService {
                 apiService.get(API_CONFIG.ENDPOINTS.PROJECTS.BASE),
                 apiService.get(API_CONFIG.ENDPOINTS.EVENTS.BASE),
                 apiService.get(API_CONFIG.ENDPOINTS.DONATIONS.BASE),
-                apiService.get(API_CONFIG.ENDPOINTS.VOLUNTEERS.RECENT)
+                apiService.get(API_CONFIG.ENDPOINTS.VOLUNTEERS.BASE)
             ]);
 
             // Combine and sort by date
@@ -138,7 +138,7 @@ class AdminService {
      */
     static async approveUser(userId) {
         try {
-            return await apiService.post(API_CONFIG.ENDPOINTS.USERS.APPROVE(userId));
+            return await apiService.put(API_CONFIG.ENDPOINTS.USERS.APPROVE(userId));
         } catch (error) {
             throw error;
         }
@@ -149,7 +149,11 @@ class AdminService {
      */
     static async updateUserRole(userId, role) {
         try {
-            return await apiService.put(API_CONFIG.ENDPOINTS.USERS.BY_ID(userId), { role });
+            // Fetch user first to get current data
+            const user = await apiService.get(API_CONFIG.ENDPOINTS.USERS.BY_ID(userId));
+            // Update role
+            user.role = role;
+            return await apiService.put(API_CONFIG.ENDPOINTS.USERS.BY_ID(userId), user);
         } catch (error) {
             throw error;
         }
@@ -171,7 +175,7 @@ class AdminService {
      */
     static async getPendingApprovals() {
         try {
-            return await apiService.get(API_CONFIG.ENDPOINTS.USERS.PENDING_APPROVAL);
+            return await apiService.get(API_CONFIG.ENDPOINTS.USERS.UNAPPROVED);
         } catch (error) {
             throw error;
         }

@@ -62,7 +62,10 @@ class APIService {
             }
 
             // Retry logic for network errors
-            if (retryCount < this.retryAttempts) {
+            if (
+                retryCount < this.retryAttempts &&
+                (!error.status || error.status >= 500)
+            ) {
                 console.warn(`Request failed, retrying... (${retryCount + 1}/${this.retryAttempts})`);
                 await this.delay(this.retryDelay);
                 return this.request(endpoint, options, retryCount + 1);
@@ -163,7 +166,9 @@ class APIService {
      * @returns {object} Authorization header
      */
     getAuthHeader() {
-        const token = StorageUtil.get('auth_token');
+        const adminToken = StorageUtil.get('admin_auth_token');
+        const userToken = StorageUtil.get('auth_token');
+        const token = adminToken || userToken;
         return token ? { 'Authorization': `Bearer ${token}` } : {};
     }
 
@@ -203,18 +208,21 @@ class APIService {
     handleUnauthorized() {
         // Clear auth data
         StorageUtil.remove('auth_token');
-        StorageUtil.remove('user_email');
-        StorageUtil.remove('user_role');
+        StorageUtil.remove('admin_auth_token');
+        StorageUtil.remove('user_data');
 
         // Show notification
         if (typeof ToastNotification !== 'undefined') {
             ToastNotification.error('Your session has expired. Please login again.');
         }
 
+        const isAdminRoute = window.location.pathname.includes('/admin');
+        const loginPath = isAdminRoute ? '/pages/admin/login.html' : '/login.html';
+
         // Redirect to login after a short delay
         setTimeout(() => {
-            window.location.href = '/login.html';
-        }, 1500);
+            window.location.href = loginPath;
+        }, 1200);
     }
 
     /**

@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Ajelo Foundation</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/image-management.css">
+    <link rel="stylesheet" href="../css/responsive.css">
     <link rel="stylesheet" href="../css/pages/about-us.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -160,6 +164,8 @@
 
                 <!-- Admin link -->
                 <a href="#" id="adminLink" class="admin-link visible" onclick="openAdminLogin(); return false;">⚙️ Admin</a>
+
+                <!-- Logout button - hidden until logged in -->
                 <button class="logout-btn" id="adminLogoutBtn" onclick="adminLogout()">🚪 Logout</button>
             </nav>
         </div>

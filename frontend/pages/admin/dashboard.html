@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Charity Platform</title>
-    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/layout.css">
     <link rel="stylesheet" href="../../css/components.css">
-    <link rel="stylesheet" href="../../css/pages/admin.css">
+    <link rel="stylesheet" href="../../css/pages/admin/admin.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
 </head>
 <body class="admin-layout">
-<!-- Admin Sidebar -->
-<aside id="admin-sidebar" class="admin-sidebar">
-    <div class="sidebar-header">
-        <h2>Admin Panel</h2>
-        <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
-    </div>
+<!-- Sidebar (Slim + Professional) -->
+<aside class="admin-sidebar">
+    <div class="sidebar-logo">Charity Admin</div>
 
     <nav class="sidebar-nav">
         <a href="dashboard.html" class="nav-item active">
@@ -56,135 +55,134 @@
     </nav>
 
     <div class="sidebar-footer">
-        <button id="logout-btn" class="btn btn-secondary btn-block">
-            Logout
+        <button id="logout-btn" class="nav-item" style="width: 100%; border: none; background: none; cursor: pointer;">
+            <span class="nav-icon">🚪</span>
+            <span class="nav-text">Logout</span>
         </button>
     </div>
 </aside>
 
 <!-- Main Content -->
 <main class="admin-main">
-    <!-- Top Bar -->
+    <!-- Header (Utility Bar) -->
     <header class="admin-header">
         <div class="header-left">
-            <h1>Dashboard</h1>
+            <span class="breadcrumb">Admin / Dashboard</span>
+            <h1>Overview</h1>
         </div>
+
         <div class="header-right">
-            <div class="user-info">
+            <input class="search" placeholder="Search users, projects..." />
+            <div class="user-pill">
                 <span id="user-name">Loading...</span>
-                <span id="user-role" class="user-role"></span>
+                <small id="user-role">Super Admin</small>
             </div>
         </div>
     </header>
 
     <!-- Dashboard Content -->
     <div class="admin-content">
-        <!-- Stats Grid -->
+        <!-- Insight Cards -->
         <section class="stats-overview">
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-icon">👥</span>
-                    <span class="stat-label">Total Users</span>
+            <div class="stat-card highlight">
+                <div class="stat-top">
+                    <span class="label">Total Donations</span>
+                    <span class="trend up">↗ +12%</span>
                 </div>
-                <div class="stat-value" id="total-users">0</div>
-                <div class="stat-details">
-                    <span id="pending-users">0 pending approval</span>
-                </div>
+                <div class="stat-main" id="total-donations">KES 0</div>
+                <div class="stat-sub">Last 30 days</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-icon">📁</span>
-                    <span class="stat-label">Projects</span>
+                <div class="stat-top">
+                    <span class="label">Active Projects</span>
+                    <span class="trend up">↗ +2</span>
                 </div>
-                <div class="stat-value" id="total-projects">0</div>
-                <div class="stat-details">
-                    <span id="ongoing-projects">0 ongoing</span>
-                </div>
+                <div class="stat-main" id="total-projects">0</div>
+                <div class="stat-sub">Ongoing initiatives</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-icon">💰</span>
-                    <span class="stat-label">Donations</span>
+                <div class="stat-top">
+                    <span class="label">New Volunteers</span>
+                    <span class="trend up">↗ +5%</span>
                 </div>
-                <div class="stat-value" id="total-donations">KES 0</div>
-                <div class="stat-details">
-                    <span id="pending-donations">0 pending</span>
-                </div>
+                <div class="stat-main" id="total-volunteers">0</div>
+                <div class="stat-sub">This month</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-icon">🤝</span>
-                    <span class="stat-label">Volunteers</span>
+                <div class="stat-top">
+                    <span class="label">Pending Approvals</span>
+                    <span class="trend down">↘ -3</span>
                 </div>
-                <div class="stat-value" id="total-volunteers">0</div>
-                <div class="stat-details">
-                    <span id="active-volunteers">0 active</span>
-                </div>
+                <div class="stat-main" id="pending-users">0</div>
+                <div class="stat-sub">Requires attention</div>
             </div>
         </section>
 
-        <!-- Charts Row -->
+        <!-- Main Grid -->
         <div class="grid-2">
-            <!-- Pending Approvals -->
-            <section class="card">
+            <!-- Action List (Pending Approvals) -->
+            <section class="admin-card">
                 <div class="card-header">
                     <h3>Pending Approvals</h3>
-                    <button class="btn btn-sm btn-primary" onclick="window.location.href='users.html'">
-                        View All
-                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.location.href='users.html'">View All</button>
                 </div>
                 <div class="card-body">
                     <div id="pending-approvals-list" class="approval-list">
-                        <!-- Pending approvals will be loaded here -->
+                        <!-- Example Item (will be replaced by JS) -->
+                        <div class="approval-item">
+                            <div class="approval-info">
+                                <strong>Jane Doe</strong>
+                                <small>jane@example.com · 2h ago</small>
+                            </div>
+                            <div class="actions">
+                                <button class="btn-approve">Approve</button>
+                                <button class="btn-reject">Reject</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Recent Activity -->
-            <section class="card">
+            <!-- Timeline (Recent Activity) -->
+            <section class="admin-card">
                 <div class="card-header">
                     <h3>Recent Activity</h3>
-                    <button class="btn btn-sm btn-secondary" onclick="window.location.href='activity.html'">
-                        View All
-                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="window.location.href='activity.html'">View All</button>
                 </div>
                 <div class="card-body">
                     <div id="recent-activity-list" class="activity-list">
-                        <!-- Recent activity will be loaded here -->
+                        <!-- Example Item (will be replaced by JS) -->
+                        <div class="activity-item">
+                            <span class="dot success"></span>
+                            <div class="activity-content">
+                                <strong>User Approved</strong>
+                                <small>Jane Doe · 10 mins ago</small>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <span class="dot primary"></span>
+                            <div class="activity-content">
+                                <strong>Project Created</strong>
+                                <small>Clean Water Initiative · 1h ago</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
         </div>
+    </div>
 
-        <!-- Quick Actions -->
-        <section class="card">
-            <div class="card-header">
-                <h3>Quick Actions</h3>
-            </div>
-            <div class="card-body">
-                <div class="quick-actions">
-                    <button class="action-btn" onclick="window.location.href='projects.html?action=create'">
-                        <span class="action-icon">➕</span>
-                        <span>Create Project</span>
-                    </button>
-                    <button class="action-btn" onclick="window.location.href='events.html?action=create'">
-                        <span class="action-icon">📅</span>
-                        <span>Create Event</span>
-                    </button>
-                    <button class="action-btn" id="backup-btn">
-                        <span class="action-icon">💾</span>
-                        <span>Backup Data</span>
-                    </button>
-                    <button class="action-btn" id="export-btn">
-                        <span class="action-icon">📊</span>
-                        <span>Export Reports</span>
-                    </button>
-                </div>
-            </div>
-        </section>
+    <!-- Floating Actions -->
+    <div class="floating-actions">
+        <button class="floating-btn" onclick="window.location.href='projects.html?action=create'" title="Create Project">
+            📁
+        </button>
+        <button class="floating-btn" onclick="window.location.href='events.html?action=create'" title="Create Event">
+            📅
+        </button>
     </div>
 </main>
 
