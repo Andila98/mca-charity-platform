@@ -1,6 +1,6 @@
 /**
- * Admin Content Editor
- * Manages inline editing and saving of page content
+ * Admin Content Editor (Multi-Page Aware)
+ * Manages inline editing and saving of page content.
  */
 class AdminContentEditor {
     constructor(authService, contentManager) {
@@ -8,7 +8,11 @@ class AdminContentEditor {
         this.contentManager = contentManager;
         this.currentEditElement = null;
         this.isEditMode = false;
-        this.pageName = 'landing'; // Default page
+        this.pageName = getCurrentPageName(); // Auto-detect page
+
+        if(this.contentManager) {
+            this.contentManager.pageName = this.pageName;
+        }
     }
 
     /**
@@ -16,7 +20,10 @@ class AdminContentEditor {
      */
     init() {
         this.setupEventListeners();
-        this.loadPageContent();
+        // Load content if authenticated
+        if (this.authService.isAuthenticated()) {
+            this.loadPageContent();
+        }
     }
 
     /**
@@ -24,21 +31,18 @@ class AdminContentEditor {
      * @private
      */
     setupEventListeners() {
-        // Handle clicks on editable elements
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('editable') && this.isEditMode) {
                 this.startEdit(e);
             }
         });
 
-        // Close editor on escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.cancelEdit();
             }
         });
 
-        // Close editor on outside click
         const editor = document.getElementById('inlineEditor');
         if (editor) {
             document.addEventListener('click', (e) => {
@@ -53,19 +57,13 @@ class AdminContentEditor {
 
     /**
      * Load page content from backend
-     * @private
      */
     async loadPageContent() {
-        if (!this.authService.isAuthenticated()) {
-            console.log('⏭️  Skipping content load - not authenticated');
-            return;
-        }
-
         try {
-            console.log('📥 Loading page content from backend...');
+            console.log(`📥 Loading content for page: ${this.pageName}...`);
             const content = await this.contentManager.loadPageContent(this.pageName);
             this.applyContent(content);
-            console.log('✅ Page content loaded');
+            console.log('✅ Page content loaded and applied');
         } catch (error) {
             console.error('❌ Failed to load content:', error);
         }
@@ -90,7 +88,7 @@ class AdminContentEditor {
     enableEditMode() {
         this.isEditMode = true;
         document.body.classList.add('edit-mode-active');
-        console.log('✏️ Edit mode enabled');
+        console.log(`✏️ Edit mode enabled for page: ${this.pageName}`);
     }
 
     /**
@@ -116,47 +114,36 @@ class AdminContentEditor {
         const editor = document.getElementById('inlineEditor');
         const textarea = document.getElementById('editorContent');
 
-        // Set initial content
         textarea.value = currentContent;
         editor.classList.add('active');
 
-        // Position editor near clicked element
         const rect = this.currentEditElement.getBoundingClientRect();
         editor.style.top = (rect.top + window.scrollY - 120) + 'px';
         editor.style.left = Math.min(rect.left + window.scrollX, window.innerWidth - 350) + 'px';
 
-        // Store data
         editor.dataset.contentKey = contentKey;
-        editor.dataset.pageName = this.pageName;
-
         textarea.focus();
         textarea.select();
     }
 
     /**
-     * Save current edit
+     * Save current edit to cache
      */
-    async saveEdit() {
+    saveEdit() {
         if (!this.currentEditElement) return;
 
         const editor = document.getElementById('inlineEditor');
         const textarea = document.getElementById('editorContent');
         const newContent = textarea.value.trim();
         const contentKey = editor.dataset.contentKey;
-        const pageName = editor.dataset.pageName;
 
         if (!newContent) {
             alert('Content cannot be empty');
             return;
         }
 
-        // Update in DOM first (for immediate feedback)
         this.currentEditElement.textContent = newContent;
-
-        // Mark as unsaved
         this.contentManager.markDirty();
-
-        // Update cache
         this.contentManager.contentCache[contentKey] = newContent;
 
         console.log(`📝 Changed: ${contentKey} (unsaved)`);
@@ -184,23 +171,20 @@ class AdminContentEditor {
         }
 
         const changes = this.contentManager.getCachedContent();
-
-        if (Object.keys(changes).length === 0) {
+        if (Object.keys(changes).length === 0 && !this.contentManager.hasUnsavedChanges()) {
             alert('⚠️ No changes to save');
             return false;
         }
 
-        // Prepare batch update
         const updates = Object.entries(changes).map(([key, value]) => ({
             contentKey: key,
             contentValue: value,
             pageName: this.pageName
         }));
 
+        const btn = document.querySelector('.admin-btn.save-btn');
         try {
-            console.log(`💾 Saving ${updates.length} changes to backend...`);
-
-            const btn = document.querySelector('[onclick="saveLandingPageChanges()"]');
+            console.log(`💾 Saving ${updates.length} changes for page '${this.pageName}'...`);
             if (btn) {
                 btn.disabled = true;
                 btn.textContent = '⏳ Saving...';
@@ -214,42 +198,18 @@ class AdminContentEditor {
             }
 
             alert('✅ All changes saved successfully!');
+            this.contentManager.clearDirty();
             return true;
 
         } catch (error) {
             alert('❌ Failed to save changes: ' + error.message);
             console.error('Save error:', error);
+            if(btn) {
+                btn.disabled = false;
+                btn.textContent = '💾 Save Changes';
+            }
             return false;
         }
-    }
-
-    /**
-     * Get unsaved change count
-     * @returns {number}
-     */
-    getUnsavedChangeCount() {
-        return Object.keys(this.contentManager.getCachedContent()).length;
-    }
-
-    /**
-     * Discard unsaved changes
-     */
-    discardChanges() {
-        if (confirm('⚠️ Discard all unsaved changes?')) {
-            this.contentManager.clearCache();
-            this.loadPageContent();
-            console.log('Changes discarded');
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Set page name (for pages other than landing)
-     */
-    setPageName(pageName) {
-        this.pageName = pageName;
-        console.log(`📄 Content editor switched to page: ${pageName}`);
     }
 }
 
@@ -260,68 +220,44 @@ class AdminContentEditor {
 let contentManager;
 let contentEditor;
 
-// Initialize when admin services are ready
-function initializeContentManagement() {
-    if (!window.adminAuthService) {
-        console.warn('⚠️ Admin auth service not initialized yet');
-        setTimeout(initializeContentManagement, 500);
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof adminAPI === 'undefined' || typeof adminAuthService === 'undefined') {
+        console.error('CRITICAL: Core services not found. Check script loading order.');
         return;
     }
 
-    contentManager = new ContentManager('http://localhost:8080/api', adminAuthService);
+    contentManager = new ContentManager(adminAPI);
     contentEditor = new AdminContentEditor(adminAuthService, contentManager);
 
-    console.log('🚀 Content management system initialized');
-    console.log('💡 Content will auto-load when admin logs in');
-}
+    // Initialize after auth status is known
+    if(adminAuthService.isAuthenticated()) {
+        contentEditor.init();
+    }
 
-document.addEventListener('DOMContentLoaded', initializeContentManagement);
+    window.contentManager = contentManager;
+    window.contentEditor = contentEditor;
+
+    console.log('🚀 Content management system initialized for multi-page support.');
+});
 
 // ============================================================
 // GLOBAL HELPER FUNCTIONS
 // ============================================================
 
-/**
- * Save all page changes
- * Called from HTML button onclick
- */
-async function saveLandingPageChanges() {
-    if (!contentEditor) {
-        alert('❌ Content editor not initialized');
-        return;
+async function savePageChanges() {
+    if (contentEditor) {
+        await contentEditor.saveAllChanges();
     }
-
-    await contentEditor.saveAllChanges();
 }
 
-/**
- * Save inline edit
- * Called from inline editor Save button
- */
 async function saveInlineEdit() {
-    if (!contentEditor) {
-        alert('❌ Content editor not initialized');
-        return;
+    if (contentEditor) {
+        contentEditor.saveEdit();
     }
-
-    await contentEditor.saveEdit();
 }
 
-/**
- * Cancel inline edit
- * Called from inline editor Cancel button
- */
 function cancelInlineEdit() {
     if (contentEditor) {
         contentEditor.cancelEdit();
-    }
-}
-
-/**
- * Discard all changes
- */
-function discardPageChanges() {
-    if (contentEditor) {
-        contentEditor.discardChanges();
     }
 }

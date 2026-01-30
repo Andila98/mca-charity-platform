@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Logs - Admin Panel</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/pages/admin.css">
+</head>
+<body class="admin-layout">
+<!-- Sidebar (same as dashboard) -->
+<aside id="admin-sidebar" class="admin-sidebar">
+    <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+        <button id="sidebar-toggle" class="sidebar-toggle">☰</button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">Dashboard</span>
+        </a>
+        <a href="projects.html" class="nav-item">
+            <span class="nav-icon">📁</span>
+            <span class="nav-text">Projects</span>
+        </a>
+        <a href="events.html" class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span class="nav-text">Events</span>
+        </a>
+        <a href="donations.html" class="nav-item">
+            <span class="nav-icon">💰</span>
+            <span class="nav-text">Donations</span>
+        </a>
+        <a href="volunteers.html" class="nav-item">
+            <span class="nav-icon">🤝</span>
+            <span class="nav-text">Volunteers</span>
+        </a>
+        <a href="users.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span class="nav-text">Users</span>
+        </a>
+        <a href="content.html" class="nav-item">
+            <span class="nav-icon">📝</span>
+            <span class="nav-text">Content</span>
+        </a>
+        <a href="activity.html" class="nav-item active">
+            <span class="nav-icon">📜</span>
+            <span class="nav-text">Activity Logs</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-text">Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-secondary btn-block">Logout</button>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main class="admin-main">
+    <header class="admin-header">
+        <div class="header-left">
+            <h1>Activity Logs</h1>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-secondary" id="export-logs-btn">
+                📊 Export Logs
+            </button>
+            <button class="btn btn-error" id="clear-logs-btn">
+                🗑️ Clear Logs
+            </button>
+        </div>
+    </header>
+
+    <div class="admin-content">
+        <!-- Filters -->
+        <section class="card">
+            <div class="card-body">
+                <div class="filters-wrapper">
+                    <div class="filter-group">
+                        <label for="action-filter">Action:</label>
+                        <select id="action-filter" class="form-control">
+                            <option value="">All Actions</option>
+                            <option value="CREATE">Create</option>
+                            <option value="UPDATE">Update</option>
+                            <option value="DELETE">Delete</option>
+                            <option value="APPROVE_USER">Approve User</option>
+                            <option value="REJECT_USER">Reject User</option>
+                            <option value="BACKUP">Backup</option>
+                            <option value="EXPORT">Export</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="entity-filter">Entity Type:</label>
+                        <select id="entity-filter" class="form-control">
+                            <option value="">All Types</option>
+                            <option value="PROJECT">Project</option>
+                            <option value="EVENT">Event</option>
+                            <option value="DONATION">Donation</option>
+                            <option value="USER">User</option>
+                            <option value="VOLUNTEER">Volunteer</option>
+                            <option value="SYSTEM">System</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="date-from">Date From:</label>
+                        <input type="date" id="date-from" class="form-control">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="date-to">Date To:</label>
+                        <input type="date" id="date-to" class="form-control">
+                    </div>
+
+                    <div class="filter-group">
+                        <button id="reset-filters" class="btn btn-secondary">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logs Table -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Activity History (<span id="log-count">0</span> entries)</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Entity</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                        </tr>
+                        </thead>
+                        <tbody id="logs-tbody">
+                        <!-- Logs will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Email Notifications -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Email Notifications (<span id="notification-count">0</span> sent)</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Recipient</th>
+                            <th>Subject</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody id="notifications-tbody">
+                        <!-- Notifications will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Scripts -->
+<script src="../../js/config/api.config.js"></script>
+<script src="../../js/utils/storage.util.js"></script>
+<script src="../../js/utils/validation.util.js"></script>
+<script src="../../js/utils/format.util.js"></script>
+<script src="../../js/utils/error-handler.util.js"></script>
+<script src="../../js/components/toast.component.js"></script>
+<script src="../../js/components/loader.component.js"></script>
+<script src="../../js/components/modal.component.js"></script>
+<script src="../../js/services/api.service.js"></script>
+<script src="../../js/services/auth.service.js"></script>
+<script src="../../js/services/admin.service.js"></script>
+<script src="../../js/pages/admin/activity.page.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!-- pages/admin/login.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Admin Login</h1>
+            <form id="admin-login-form">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../js/config/api.config.js"></script>
+    <script src="../../js/utils/storage.js"></script>
+    <script src="../../js/services/api-service.js"></script>
+    <script src="../../js/services/auth.service.js"></script>
+    <script>
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                await authService.adminLogin({ email, password });
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
