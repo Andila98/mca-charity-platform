@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Service
 @Transactional
@@ -23,131 +23,114 @@ public class DonationService {
     @Autowired
     private CharityProjectRepository projectRepository;
 
-    /**
-     * Record a new donation
-     */
     public Donation recordDonation(Donation donation, Long projectId) {
         if (projectId != null) {
             CharityProject project = projectRepository.findById(projectId)
                     .orElseThrow(() -> new ProjectNotFoundException("Project not found with ID: " + projectId));
             donation.setProject(project);
         }
-
         donation.setStatus(DonationStatus.PENDING);
-        Donation savedDonation = donationRepository.save(donation);
-        log.info("Donation recorded: {} from {} (ID: {})", donation.getAmount(), donation.getDonorName(), savedDonation.getId());
-        return savedDonation;
+        Donation saved = donationRepository.save(donation);
+        log.info("Donation recorded: {} from {} (ID: {})", donation.getAmount(), donation.getDonorName(), saved.getId());
+        return saved;
     }
 
     /**
-     * Get donation by ID
+     * FIX #6: Dedicated update method that preserves the existing status.
+     * The old code reused recordDonation() for updates, which hardcoded
+     * status = PENDING — resetting a RECEIVED or USED donation silently.
      */
+    public Donation updateDonation(Long donationId, Donation updatedData, Long projectId) {
+        Donation existing = getDonationById(donationId);
+
+        existing.setAmount(updatedData.getAmount());
+        existing.setDonorName(updatedData.getDonorName());
+        existing.setDonorEmail(updatedData.getDonorEmail());
+        existing.setDonorPhone(updatedData.getDonorPhone());
+        existing.setDonorWard(updatedData.getDonorWard());
+        existing.setDonationType(updatedData.getDonationType());
+        existing.setItemDescription(updatedData.getItemDescription());
+        existing.setNotes(updatedData.getNotes());
+
+        // Only update status if explicitly provided in the request
+        if (updatedData.getStatus() != null) {
+            existing.setStatus(updatedData.getStatus());
+        }
+
+        // Update project link if a new projectId was supplied
+        if (projectId != null) {
+            CharityProject project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new ProjectNotFoundException("Project not found with ID: " + projectId));
+            existing.setProject(project);
+        }
+
+        Donation saved = donationRepository.save(existing);
+        log.info("Donation updated: ID {}", donationId);
+        return saved;
+    }
+
     public Donation getDonationById(Long id) {
         return donationRepository.findById(id)
                 .orElseThrow(() -> new DonationNotFoundException("Donation not found with ID: " + id));
     }
 
-    /**
-     * Get all donations
-     */
     public List<Donation> getAllDonations() {
         return donationRepository.findAll();
     }
 
-    /**
-     * Get donations by status
-     */
     public List<Donation> getDonationsByStatus(DonationStatus status) {
         return donationRepository.findByStatus(status);
     }
 
-    /**
-     * Get pending donations (oldest first)
-     */
     public List<Donation> getPendingDonations() {
         return donationRepository.findByStatusOrderByDonatedAtAsc(DonationStatus.PENDING);
     }
 
-    /**
-     * Get donations by type (CASH, ITEM, SERVICE)
-     */
     public List<Donation> getDonationsByType(DonationType type) {
         return donationRepository.findByDonationType(type);
     }
 
-    /**
-     * Get donations to a specific project
-     */
     public List<Donation> getDonationsByProject(Long projectId) {
         CharityProject project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Project not found with ID: " + projectId));
         return donationRepository.findByProject(project);
     }
 
-    /**
-     * Mark donation as received
-     */
     public Donation markAsReceived(Long donationId) {
         Donation donation = getDonationById(donationId);
         donation.setStatus(DonationStatus.RECEIVED);
         donation.setReceivedAt(LocalDateTime.now());
-        Donation updatedDonation = donationRepository.save(donation);
-        log.info("Donation marked as received: {} (ID: {})", donation.getAmount(), donationId);
-        return updatedDonation;
+        return donationRepository.save(donation);
     }
 
-    /**
-     * Mark donation as used
-     */
     public Donation markAsUsed(Long donationId) {
         Donation donation = getDonationById(donationId);
         donation.setStatus(DonationStatus.USED);
-        Donation updatedDonation = donationRepository.save(donation);
-        log.info("Donation marked as used: {} (ID: {})", donation.getAmount(), donationId);
-        return updatedDonation;
+        return donationRepository.save(donation);
     }
 
-    /**
-     * Calculate total donations for a project
-     */
     public Double getTotalDonationsForProject(Long projectId) {
         projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException("..."));
-
+                .orElseThrow(() -> new ProjectNotFoundException("Project not found with ID: " + projectId));
         Double total = donationRepository.calculateTotalDonationsForProject(projectId);
         return total != null ? total : 0.0;
     }
 
-
-
-    /**
-     * Calculate total donations by type
-     */
     public Double getTotalDonationsByType(DonationType type) {
         Double total = donationRepository.calculateTotalDonationsByType(type);
         return total != null ? total : 0.0;
     }
 
-    /**
-     * Count donations by status
-     */
     public long countDonationsByStatus(DonationStatus status) {
         return donationRepository.countByStatus(status);
     }
 
-    /**
-     * Get donations by donor ward (Kenya location)
-     */
     public List<Donation> getDonationsByDonorWard(String ward) {
         return donationRepository.findByDonorWard(ward);
     }
 
-    /**
-     * Delete a donation record
-     */
     public void deleteDonation(Long id) {
-        Donation donation = getDonationById(id);
-        donationRepository.delete(donation);
-        log.info("Donation record deleted: ID {}", id);
+        donationRepository.delete(getDonationById(id));
+        log.info("Donation deleted: ID {}", id);
     }
 }

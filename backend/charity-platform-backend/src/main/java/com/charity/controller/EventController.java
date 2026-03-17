@@ -29,135 +29,85 @@ public class EventController {
     private final UserService userService;
     private final CharityProjectService projectService;
 
-    /**
-     * Create a new event
-     */
     @PostMapping
     public ResponseEntity<?> createEvent(@Valid @RequestBody EventRequest request) {
-        // Services now throw exceptions if not found, so we call directly
         User organizer = userService.getUserById(request.getOrganizedById());
-
-        CharityProject project = null;
-        if (request.getProjectId() != null) {
-            project = projectService.getProjectById(request.getProjectId());
-        }
+        CharityProject project = (request.getProjectId() != null)
+                ? projectService.getProjectById(request.getProjectId()) : null;
 
         Event event = EventMapper.toEntity(request, organizer, project);
-
-        // Match the service signature: (Event, Long, Long)
-        Event savedEvent = eventService.createEvent(event, request.getOrganizedById(), request.getProjectId());
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(EventMapper.toResponse(savedEvent));
+        Event saved = eventService.createEvent(event, request.getOrganizedById(), request.getProjectId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(EventMapper.toResponse(saved));
     }
 
-    /**
-     * Get all events
-     */
     @GetMapping
     public ResponseEntity<List<EventResponse>> getAllEvents() {
-        List<Event> events = eventService.getAllEvents();
-        List<EventResponse> response = events.stream()
-                .map(EventMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                eventService.getAllEvents().stream().map(EventMapper::toResponse).collect(Collectors.toList())
+        );
     }
 
-    /**
-     * Get event by ID
-     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getEventById(@PathVariable Long id) {
-        // Removed .orElse(null) - Service handles the exception
-        Event event = eventService.getEventById(id);
-        return ResponseEntity.ok(EventMapper.toResponse(event));
+        return ResponseEntity.ok(EventMapper.toResponse(eventService.getEventById(id)));
     }
 
-    /**
-     * Get upcoming events
-     */
     @GetMapping("/upcoming")
     public ResponseEntity<List<EventResponse>> getUpcomingEvents() {
-        List<Event> events = eventService.getUpcomingEvents();
-        List<EventResponse> response = events.stream()
-                .map(EventMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                eventService.getUpcomingEvents().stream().map(EventMapper::toResponse).collect(Collectors.toList())
+        );
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<List<EventResponse>> getEventsByStatus(@PathVariable EventStatus status) {
-        // Now this call will work because we added the method to the Service
-        List<Event> events = eventService.getEventsByStatus(status);
-
-        List<EventResponse> response = events.stream()
-                .map(EventMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                eventService.getEventsByStatus(status).stream().map(EventMapper::toResponse).collect(Collectors.toList())
+        );
     }
 
-    /**
-     * Get events by project
-     */
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<EventResponse>> getEventsByProject(@PathVariable Long projectId) {
-        // Service method takes Long projectId, not the Project object
-        List<Event> events = eventService.getEventsByProject(projectId);
-        List<EventResponse> response = events.stream()
-                .map(EventMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                eventService.getEventsByProject(projectId).stream().map(EventMapper::toResponse).collect(Collectors.toList())
+        );
     }
 
-    /**
-     * Register volunteer for event
-     */
     @PostMapping("/{eventId}/register/{volunteerId}")
-    public ResponseEntity<?> registerVolunteer(
-            @PathVariable Long eventId,
-            @PathVariable Long volunteerId) {
-
-        // Corrected method name to match Service
-        Event event = eventService.registerVolunteerForEvent(eventId, volunteerId);
-        return ResponseEntity.ok(EventMapper.toResponse(event));
+    public ResponseEntity<?> registerVolunteer(@PathVariable Long eventId, @PathVariable Long volunteerId) {
+        return ResponseEntity.ok(EventMapper.toResponse(eventService.registerVolunteerForEvent(eventId, volunteerId)));
     }
 
     /**
-     * Update event
+     * FIX #5: Now calls eventService.updateEvent() so ALL fields are persisted.
+     * The old code called updateEventStatus() which only saved the status field,
+     * silently discarding name, description, location, dates, etc.
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvent(
             @PathVariable Long id,
             @Valid @RequestBody EventRequest request) {
 
-        Event event = eventService.getEventById(id);
+        Event existing = eventService.getEventById(id);
 
         User organizer = (request.getOrganizedById() != null)
                 ? userService.getUserById(request.getOrganizedById())
-                : event.getOrganizedBy();
+                : existing.getOrganizedBy();
 
         CharityProject project = (request.getProjectId() != null)
                 ? projectService.getProjectById(request.getProjectId())
-                : event.getProject();
+                : existing.getProject();
 
-        EventMapper.updateEntity(event, request, organizer, project);
+        EventMapper.updateEntity(existing, request, organizer, project);
 
-        // Note: You may need to add an updateEvent(Long, Event) to your service
-        // For now, using repository-style save if updateEvent isn't specialized
-        Event updatedEvent = eventService.updateEventStatus(id, event.getStatus());
-
-        return ResponseEntity.ok(EventMapper.toResponse(updatedEvent));
+        // FIX: use updateEvent(), not updateEventStatus()
+        Event updated = eventService.updateEvent(id, existing);
+        return ResponseEntity.ok(EventMapper.toResponse(updated));
     }
 
-    /**
-     * Delete event
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
-        // You need to add 'deleteEvent' to EventService if it's missing
-        eventService.getEventById(id);
-        // eventService.deleteEvent(id);
+        eventService.deleteEvent(id);
         return ResponseEntity.ok("Event deleted successfully");
     }
-
 }

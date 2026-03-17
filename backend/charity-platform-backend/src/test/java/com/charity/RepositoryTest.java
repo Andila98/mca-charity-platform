@@ -3,19 +3,30 @@ package com.charity;
 import com.charity.entity.User;
 import com.charity.entity.UserRole;
 import com.charity.repository.UserRepository;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
-@Component
-public class RepositoryTest implements CommandLineRunner {
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * FIX #7: Converted from @Component / CommandLineRunner (which ran on every
+ * application startup, inserting duplicate test data into the real DB) to a
+ * proper @SpringBootTest integration test that runs only during the test phase
+ * and rolls back automatically via @Transactional.
+ */
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+class RepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
-        // Create a test user
+    @Test
+    void saveAndFindUser() {
         User testUser = new User();
         testUser.setEmail("test@example.com");
         testUser.setPassword("password123");
@@ -25,10 +36,9 @@ public class RepositoryTest implements CommandLineRunner {
         testUser.setWard("Kibra");
 
         User saved = userRepository.save(testUser);
-        System.out.println("✅ Saved user: " + saved.getId());
+        assertThat(saved.getId()).isNotNull();
 
-        // Find by email
-        var found = userRepository.findByEmail("test@example.com");
-        System.out.println("✅ Found user: " + found.get().getFullName());
+        User found = userRepository.findByEmail("test@example.com").orElseThrow();
+        assertThat(found.getFullName()).isEqualTo("Test User");
     }
 }

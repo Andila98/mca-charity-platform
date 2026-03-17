@@ -26,116 +26,71 @@ public class DonationController {
     private final DonationService donationService;
     private final CharityProjectService projectService;
 
-    /**
-     * Record a new donation
-     */
     @PostMapping
     public ResponseEntity<?> recordDonation(@Valid @RequestBody DonationRequest request) {
-        // Resolve project if specified (Service handles existence check)
-        CharityProject project = null;
-        if (request.getProjectId() != null) {
-            project = projectService.getProjectById(request.getProjectId());
-        }
-
+        CharityProject project = (request.getProjectId() != null)
+                ? projectService.getProjectById(request.getProjectId()) : null;
         Donation donation = DonationMapper.toEntity(request, project);
-        // Corrected: Passing both entity and projectId to match Service signature
-        Donation savedDonation = donationService.recordDonation(donation, request.getProjectId());
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(DonationMapper.toResponse(savedDonation));
+        Donation saved = donationService.recordDonation(donation, request.getProjectId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(DonationMapper.toResponse(saved));
     }
 
-    /**
-     * Get all donations
-     */
     @GetMapping
     public ResponseEntity<List<DonationResponse>> getAllDonations() {
-        List<Donation> donations = donationService.getAllDonations();
-        List<DonationResponse> response = donations.stream()
-                .map(DonationMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                donationService.getAllDonations().stream()
+                        .map(DonationMapper::toResponse).collect(Collectors.toList())
+        );
     }
 
-    /**
-     * Get donation by ID
-     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getDonationById(@PathVariable Long id) {
-        // Service throws exception if null, no need for .orElse(null)
-        Donation donation = donationService.getDonationById(id);
-        return ResponseEntity.ok(DonationMapper.toResponse(donation));
+        return ResponseEntity.ok(DonationMapper.toResponse(donationService.getDonationById(id)));
     }
 
-    /**
-     * Get donations by status
-     */
     @GetMapping("/status/{status}")
     public ResponseEntity<List<DonationResponse>> getDonationsByStatus(@PathVariable DonationStatus status) {
-        List<Donation> donations = donationService.getDonationsByStatus(status);
-        List<DonationResponse> response = donations.stream()
-                .map(DonationMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                donationService.getDonationsByStatus(status).stream()
+                        .map(DonationMapper::toResponse).collect(Collectors.toList())
+        );
     }
 
-    /**
-     * Get donations by project
-     */
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<DonationResponse>> getDonationsByProject(@PathVariable Long projectId) {
-        // Service takes Long ID directly, avoiding redundant Project fetch
-        List<Donation> donations = donationService.getDonationsByProject(projectId);
-        List<DonationResponse> response = donations.stream()
-                .map(DonationMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                donationService.getDonationsByProject(projectId).stream()
+                        .map(DonationMapper::toResponse).collect(Collectors.toList())
+        );
     }
 
-    /**
-     * Get total donations for a project
-     */
     @GetMapping("/project/{projectId}/total")
     public ResponseEntity<Double> getTotalDonationsForProject(@PathVariable Long projectId) {
-        // 1. You don't need to fetch the project here.
-        // The Service method already checks if the project exists.
-        Double total = donationService.getTotalDonationsForProject(projectId);
-
-        // 2. Return the total (Service ensures it's at least 0.0)
-        return ResponseEntity.ok(total);
+        return ResponseEntity.ok(donationService.getTotalDonationsForProject(projectId));
     }
 
     /**
-     * Update donation
+     * FIX #6: Now calls donationService.updateDonation() instead of recordDonation().
+     * recordDonation() hardcoded status = PENDING, which silently reset RECEIVED/USED donations.
+     * updateDonation() preserves the existing status unless explicitly changed in the request.
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDonation(
             @PathVariable Long id,
             @Valid @RequestBody DonationRequest request) {
 
-        Donation donation = donationService.getDonationById(id);
-
+        Donation existing = donationService.getDonationById(id);
         CharityProject project = (request.getProjectId() != null)
                 ? projectService.getProjectById(request.getProjectId())
-                : donation.getProject();
+                : existing.getProject();
 
-        DonationMapper.updateEntity(donation, request, project);
-
-        // Note: You may need a generic update method in Service
-        // For now, recordDonation acts similarly to save
-        Donation updatedDonation = donationService.recordDonation(donation, request.getProjectId());
-
-        return ResponseEntity.ok(DonationMapper.toResponse(updatedDonation));
+        DonationMapper.updateEntity(existing, request, project);
+        Donation updated = donationService.updateDonation(id, existing, request.getProjectId());
+        return ResponseEntity.ok(DonationMapper.toResponse(updated));
     }
 
-    /**
-     * Delete donation
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDonation(@PathVariable Long id) {
-        // First check existence (Service throws exception if missing)
-        donationService.getDonationById(id);
-
         donationService.deleteDonation(id);
         return ResponseEntity.ok("Donation deleted successfully");
     }
