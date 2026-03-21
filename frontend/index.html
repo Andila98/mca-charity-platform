@@ -332,12 +332,33 @@
         </div>
     </footer>
 
-    <!-- Configuration -->
-    <script src="js/page-config.js"></script>
+    <!--
+  SCRIPT LOADING TEMPLATE
+  Use this order in all HTML files to avoid conflicts
+  Copy the entire block and paste at the end of <body> tag
+-->
 
-    <!-- Core Services -->
-    <script src="js/services/api.service.js"></script>
-    <script src="js/admin-auth-service.js"></script>
+    <!-- ============================================================
+         PHASE 1: CONFIGURATION (no dependencies)
+         ============================================================ -->
+    <script src="js/config/api.config.js"></script>
+
+
+    <!-- ============================================================
+     PHASE 2: CORE SERVICES (dependency: config)
+     These MUST be loaded before anything else
+     ============================================================ -->
+    <script src="js/core/storage-service.js"></script>
+    <script src="js/core/api-client.js"></script>
+    <script src="js/core/auth-service.js"></script>
+
+    !-- ============================================================
+    PHASE 3: UTILITIES (dependency: core services)
+    ============================================================ -->
+    <script src="js/utils/constants.js"></script>
+    <script src="js/utils/validation.js"></script>
+    <script src="js/utils/format.js"></script>
+    <script src="js/utils/error-handler.js"></script>
 
     <!-- Feature Modules -->
     <script src="js/content-manager.js"></script>
