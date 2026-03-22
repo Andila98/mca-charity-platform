@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,9 +26,6 @@ public class EventService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Create a new event
-     */
     public Event createEvent(Event event, Long organizedByUserId, Long projectId) {
         User user = userRepository.findById(organizedByUserId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + organizedByUserId));
@@ -46,130 +44,101 @@ public class EventService {
         return savedEvent;
     }
 
-    /**
-     * Get event by ID
-     */
     public Event getEventById(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new EventNotFoundException("Event not found with ID: " + id));
     }
 
-    /**
-     * Get all events
-     */
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
     }
 
-    /**
-     * Get upcoming events (not yet started)
-     */
     public List<Event> getUpcomingEvents() {
         return eventRepository.findUpcomingEvents(LocalDateTime.now());
     }
 
-    /**
-     * Get past events (already happened)
-     */
     public List<Event> getPastEvents() {
         return eventRepository.findPastEvents(LocalDateTime.now());
     }
 
-    /**
-     * Get events by project
-     */
     public List<Event> getEventsByProject(Long projectId) {
         CharityProject project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Project not found with ID: " + projectId));
         return eventRepository.findByProject(project);
     }
 
-    /**
-     * Get events organized by a user
-     */
     public List<Event> getEventsByOrganizer(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         return eventRepository.findByOrganizedBy(user);
     }
 
-    /**
-     * Get all events with a specific status
-     */
     public List<Event> getEventsByStatus(EventStatus status) {
         return eventRepository.findByStatus(status);
     }
 
     /**
-     * Register volunteer for event
+     * FIX #5: Proper full update — all fields persisted, not just status.
+     * The old code called EventMapper.updateEntity() (which set fields on the
+     * local object) but then called updateEventStatus() which only saved the
+     * status field, silently discarding every other change.
      */
-    public Event registerVolunteerForEvent(Long eventId, Long volunteerId) {
-        Event event = getEventById(eventId);
-
-        if (event.getRegisteredVolunteerIds().contains(volunteerId)) {
-            throw new AlreadyRegisteredException("Volunteer already registered for this event");
+    public Event updateEvent(Long id, Event updatedData) {
+        Event existing = getEventById(id);
+        existing.setName(updatedData.getName());
+        existing.setDescription(updatedData.getDescription());
+        existing.setLocation(updatedData.getLocation());
+        existing.setEventDate(updatedData.getEventDate());
+        existing.setEventEndTime(updatedData.getEventEndTime());
+        existing.setEventImageUrl(updatedData.getEventImageUrl());
+        existing.setExpectedAttendees(updatedData.getExpectedAttendees());
+        existing.setStatus(updatedData.getStatus());
+        if (updatedData.getOrganizedBy() != null) {
+            existing.setOrganizedBy(updatedData.getOrganizedBy());
         }
-
-        event.getRegisteredVolunteerIds().add(volunteerId);
-        Event updatedEvent = eventRepository.save(event);
-        log.info("Volunteer {} registered for event {}", volunteerId, eventId);
-        return updatedEvent;
+        if (updatedData.getProject() != null) {
+            existing.setProject(updatedData.getProject());
+        }
+        Event saved = eventRepository.save(existing);
+        log.info("Event updated: {} (ID: {})", saved.getName(), id);
+        return saved;
     }
 
-    /**
-     * Unregister volunteer from event
-     */
-    public Event unregisterVolunteerFromEvent(Long eventId, Long volunteerId) {
-        Event event = getEventById(eventId);
-
-        if (!event.getRegisteredVolunteerIds().contains(volunteerId)) {
-            throw new VolunteerNotFoundException("Volunteer not registered for this event");
-        }
-
-        event.getRegisteredVolunteerIds().remove(volunteerId);
-        Event updatedEvent = eventRepository.save(event);
-        log.info("Volunteer {} unregistered from event {}", volunteerId, eventId);
-        return updatedEvent;
-    }
-
-    /**
-     * Update event status
-     */
     public Event updateEventStatus(Long eventId, EventStatus newStatus) {
         Event event = getEventById(eventId);
         event.setStatus(newStatus);
-        Event updatedEvent = eventRepository.save(event);
-        log.info("Event status updated: {} -> {} (ID: {})", event.getName(), newStatus, eventId);
-        return updatedEvent;
+        return eventRepository.save(event);
     }
 
-    public Event updateEvent(Long id, Event updatedEvent) {
-        Event existing = getEventById(id);
-        // Note: Since 'existing' is a managed entity,
-        // simply updating its fields and exiting the @Transactional method
-        // will often save it automatically, but .save() is fine for clarity.
-        return eventRepository.save(existing);
+    public Event registerVolunteerForEvent(Long eventId, Long volunteerId) {
+        Event event = getEventById(eventId);
+        if (event.getRegisteredVolunteerIds().contains(volunteerId)) {
+            throw new AlreadyRegisteredException("Volunteer already registered for this event");
+        }
+        event.getRegisteredVolunteerIds().add(volunteerId);
+        return eventRepository.save(event);
     }
 
-    /**
-     * Update actual attendance
-     */
+    public Event unregisterVolunteerFromEvent(Long eventId, Long volunteerId) {
+        Event event = getEventById(eventId);
+        if (!event.getRegisteredVolunteerIds().contains(volunteerId)) {
+            throw new VolunteerNotFoundException("Volunteer not registered for this event");
+        }
+        event.getRegisteredVolunteerIds().remove(volunteerId);
+        return eventRepository.save(event);
+    }
+
     public Event updateActualAttendees(Long eventId, int actualCount) {
         Event event = getEventById(eventId);
         event.setActualAttendees(actualCount);
         return eventRepository.save(event);
     }
 
-    /**
-     * Get count of registered volunteers
-     */
     public int getRegisteredVolunteerCount(Long eventId) {
-        Event event = getEventById(eventId);
-        return event.getRegisteredVolunteerIds().size();
+        return getEventById(eventId).getRegisteredVolunteerIds().size();
     }
 
     public void deleteEvent(Long id) {
-        Event event = getEventById(id);
-        eventRepository.delete(event);
+        eventRepository.delete(getEventById(id));
     }
 }

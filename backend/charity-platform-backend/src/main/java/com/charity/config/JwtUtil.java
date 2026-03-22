@@ -15,25 +15,29 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
+
     @Value("${jwt.secret}")
     private String secretKey;
 
+    // Token validity: 10 hours
+    private final long EXPIRATION_TIME = 1000L * 60 * 60 * 10;
+
+    /**
+     * Single signing key derived from config.
+     * FIX: Removed the old random SECRET_KEY field that ignored jwt.secret entirely.
+     * Tokens now survive server restarts and are consistent across instances.
+     */
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-    // Secret key for signing tokens (in production, store in environment variables)
-    private final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
-    // Token validity: 10 hours
-    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
 
     /**
      * Generate JWT token for a user
      */
-    public String generateToken(String email) {
+    public String generateToken(String subject) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, email);
+        return createToken(claims, subject);
     }
 
     /**
@@ -42,30 +46,25 @@ public class JwtUtil {
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(subject) // User email
+                .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SECRET_KEY)
+                .signWith(getSigningKey())
                 .compact();
     }
 
     /**
-     * Extract email from token
+     * Extract email (subject) from token
      */
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
     }
 
     /**
-     * Extract username from token
+     * Extract username from token — same as extractEmail, kept for compatibility
      */
-    public  String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
     }
 
     /**
@@ -73,7 +72,7 @@ public class JwtUtil {
      */
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -82,16 +81,15 @@ public class JwtUtil {
     /**
      * Check if token is expired
      */
-    private Boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
     }
 
     /**
-     * Validate token
+     * Validate token against a subject (email or username)
      */
-    public Boolean validateToken(String token, String email) {
-        final String extractedEmail = extractEmail(token);
-        return (extractedEmail.equals(email) && !isTokenExpired(token));
+    public boolean validateToken(String token, String subject) {
+        final String extracted = extractUsername(token);
+        return extracted.equals(subject) && !isTokenExpired(token);
     }
-
 }
