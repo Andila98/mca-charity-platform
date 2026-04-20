@@ -46,7 +46,7 @@ export default function ActivityPage() {
                     {item._type === 'image' ? `Image uploaded: ${item.imageKey}` : `Content updated: ${item.contentKey}`}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {item._type === 'content' ? `Page: ${item.pageName}` : `Page: ${item.pageName}`}
+                    {`Page: ${item.pageName}`}
                     {item.updatedBy && ` · By ${item.updatedBy}`}
                   </p>
                 </div>

@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:8080/api/v1'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1'
 
 export const USER_ROLES = { ADMIN: 'ADMIN', EDITOR: 'EDITOR', VIEWER: 'VIEWER' }
 export const PROJECT_STATUS = { PLANNED: 'PLANNED', ONGOING: 'ONGOING', COMPLETED: 'COMPLETED', CANCELLED: 'CANCELLED' }

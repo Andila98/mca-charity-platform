@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import LoadingSpinner from '../common/LoadingSpinner'
 
 export function ProtectedRoute({ children, requireAdmin = false }) {
-  const { user, admin, loading, isAuthenticated, isAdminAuthenticated } = useAuth()
+  const { loading, isAuthenticated, isAdminAuthenticated } = useAuth()
   const location = useLocation()
 
   if (loading) return <LoadingSpinner fullPage />
@@ -20,7 +20,7 @@ export function ProtectedRoute({ children, requireAdmin = false }) {
 }
 
 export function AdminRoute({ children, requireEditor = false }) {
-  const { admin, loading, isAdminAuthenticated, isAdmin, isEditor } = useAuth()
+  const { loading, isAdminAuthenticated, isEditor } = useAuth()
   const location = useLocation()
 
   if (loading) return <LoadingSpinner fullPage />

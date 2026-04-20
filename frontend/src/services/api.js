@@ -25,7 +25,6 @@ http.interceptors.response.use(
   }
 )
 
-// Auth
 export const authApi = {
   login: (data) => http.post('/auth/login', data),
   register: (data) => http.post('/auth/register', data),
@@ -33,7 +32,6 @@ export const authApi = {
   validateToken: () => http.get('/admin/auth/validate'),
 }
 
-// Users
 export const usersApi = {
   list: () => http.get('/users'),
   getById: (id) => http.get(`/users/${id}`),
@@ -44,7 +42,6 @@ export const usersApi = {
   delete: (id) => http.delete(`/users/${id}`),
 }
 
-// Projects
 export const projectsApi = {
   list: () => http.get('/projects'),
   getById: (id) => http.get(`/projects/${id}`),
@@ -57,7 +54,6 @@ export const projectsApi = {
   delete: (id) => http.delete(`/projects/${id}`),
 }
 
-// Donations
 export const donationsApi = {
   list: () => http.get('/donations'),
   getById: (id) => http.get(`/donations/${id}`),
@@ -69,7 +65,6 @@ export const donationsApi = {
   delete: (id) => http.delete(`/donations/${id}`),
 }
 
-// Events
 export const eventsApi = {
   list: () => http.get('/events'),
   getById: (id) => http.get(`/events/${id}`),
@@ -82,7 +77,6 @@ export const eventsApi = {
   delete: (id) => http.delete(`/events/${id}`),
 }
 
-// Volunteers
 export const volunteersApi = {
   list: () => http.get('/volunteers'),
   getById: (id) => http.get(`/volunteers/${id}`),
@@ -94,7 +88,6 @@ export const volunteersApi = {
   delete: (id) => http.delete(`/volunteers/${id}`),
 }
 
-// Content Management
 export const contentApi = {
   getByKey: (key) => http.get(`/admin/content/${key}`),
   getByPage: (pageName) => http.get(`/admin/content/page/${pageName}`),
@@ -105,7 +98,6 @@ export const contentApi = {
   delete: (key) => http.delete(`/admin/content/${key}`),
 }
 
-// Images
 export const imagesApi = {
   upload: (formData) => http.post('/admin/images/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   getByKey: (key) => http.get(`/admin/images/${key}`),
