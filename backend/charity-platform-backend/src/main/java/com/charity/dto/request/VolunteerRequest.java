@@ -1,6 +1,7 @@
 package com.charity.dto.request;
 
 import com.charity.entity.VolunteerStatus;
+import com.charity.validation.ValidWard;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class VolunteerRequest {
     private String phone;
 
     @NotBlank(message = "Ward is required")
+    @ValidWard
     private String ward;
 
     private List<String> interests;

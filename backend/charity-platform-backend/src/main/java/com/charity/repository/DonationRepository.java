@@ -2,6 +2,8 @@
 package com.charity.repository;
 
 import com.charity.entity.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -74,4 +76,8 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
      * Count donations by type
      */
     long countByDonationType(DonationType donationType);
+
+    // ===== Paginated overloads =====
+    Page<Donation> findByStatus(DonationStatus status, Pageable pageable);
+    Page<Donation> findByProject(CharityProject project, Pageable pageable);
 }

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useDropzone } from 'react-dropzone'
 import { toast } from 'react-toastify'
+import { useRequireEditor } from '../../hooks/useRequireRole'
 import { FiUpload, FiTrash2, FiImage } from 'react-icons/fi'
 import { imagesApi } from '../../services/api'
 import { formatDate } from '../../utils/format'
@@ -14,6 +15,7 @@ import { FormField, Input, Textarea } from '../../components/common/FormField'
 const PAGES = ['home', 'about', 'donate', 'events', 'volunteers', 'impact']
 
 export default function ImagesPage() {
+  useRequireEditor()
   const qc = useQueryClient()
   const [selectedPage, setSelectedPage] = useState('home')
   const [uploadOpen, setUploadOpen] = useState(false)
@@ -56,7 +58,7 @@ export default function ImagesPage() {
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: { 'image/*': [] }, maxFiles: 1 })
-  const images = data?.data || []
+  const images = data?.data?.content || data?.data || []
   const stats = statsRes?.data
 
   return (

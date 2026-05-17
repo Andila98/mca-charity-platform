@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 public class AdminLoginResponse {
 
     private String token;
+    private String refreshToken;
     private String username;
     private String role;
     private LocalDateTime loginTime;
     private String message;
-    private Long
-            expiresIn; //in seconds
+    private Long expiresIn;
 }

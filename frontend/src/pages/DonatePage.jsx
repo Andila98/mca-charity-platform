@@ -10,7 +10,7 @@ import { FormField, Input, Select, Textarea } from '../components/common/FormFie
 
 export default function DonatePage() {
   const { data: projectsRes } = useQuery({ queryKey: ['projects'], queryFn: () => projectsApi.list() })
-  const projects = projectsRes?.data || []
+  const projects = projectsRes?.data?.content || projectsRes?.data || []
 
   const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(donationSchema),

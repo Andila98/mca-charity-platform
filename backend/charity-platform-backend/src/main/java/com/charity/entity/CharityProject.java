@@ -6,11 +6,13 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "charity_projects")
+@SQLRestriction("deleted = false")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,6 +57,10 @@ public class CharityProject {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private boolean deleted = false;
+
+    private LocalDateTime deletedAt;
 
     @PrePersist
     protected void onCreate() {

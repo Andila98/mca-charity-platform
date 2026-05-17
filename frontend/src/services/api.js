@@ -1,34 +1,106 @@
 import axios from 'axios'
 import { API_BASE_URL } from '../utils/constants'
+import { tokenStore } from './tokenStore'
 
 const http = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
+  // Required so the browser sends httpOnly cookies (refresh token) on cross-origin requests
+  withCredentials: true,
 })
 
+// Attach the current access token to every request
 http.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token') || localStorage.getItem('auth_token')
+  const token = tokenStore.getAdminToken() || tokenStore.getAuthToken()
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
+// Track whether a token refresh is already in flight to avoid loops
+let isRefreshing = false
+let pendingQueue = []
+
+const processQueue = (error, token = null) => {
+  pendingQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token)))
+  pendingQueue = []
+}
+
+// On 401: silently refresh the access token via httpOnly cookie, then retry
 http.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('admin_token')
-      localStorage.removeItem('auth_token')
-      window.location.href = '/login'
+  async (err) => {
+    const original = err.config
+
+    // Only attempt refresh once per request, and not on the refresh endpoint itself
+    if (
+      err.response?.status === 401 &&
+      !original._retry &&
+      !original.url?.includes('/auth/refresh')
+    ) {
+      if (isRefreshing) {
+        // Another refresh is already in flight — queue this request
+        return new Promise((resolve, reject) => {
+          pendingQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            original.headers.Authorization = `Bearer ${token}`
+            return http(original)
+          })
+          .catch((e) => Promise.reject(e))
+      }
+
+      original._retry = true
+      isRefreshing = true
+
+      const isAdmin = !!tokenStore.getAdminToken()
+      const refreshUrl = isAdmin ? '/admin/auth/refresh' : '/auth/refresh'
+
+      try {
+        // The httpOnly refresh-token cookie is sent automatically by the browser
+        const { data } = await http.post(refreshUrl)
+        const newAccessToken = data.accessToken
+
+        isAdmin ? tokenStore.setAdminToken(newAccessToken) : tokenStore.setAuthToken(newAccessToken)
+        http.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`
+        processQueue(null, newAccessToken)
+
+        original.headers.Authorization = `Bearer ${newAccessToken}`
+        return http(original)
+      } catch (refreshError) {
+        processQueue(refreshError, null)
+        _handleLogout(isAdmin)
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
     }
+
     return Promise.reject(err)
   }
 )
 
+function _handleLogout(isAdmin) {
+  if (isAdmin) {
+    tokenStore.clearAdminToken()
+    localStorage.removeItem('admin_user')
+    window.location.href = '/admin/login'
+  } else {
+    tokenStore.clearAuthToken()
+    localStorage.removeItem('user')
+    window.location.href = '/login'
+  }
+}
+
 export const authApi = {
   login: (data) => http.post('/auth/login', data),
   register: (data) => http.post('/auth/register', data),
+  // Cookie is sent automatically; no body needed
+  logout: () => http.post('/auth/logout'),
+  refresh: () => http.post('/auth/refresh'),
   adminLogin: (data) => http.post('/admin/auth/login', data),
+  adminLogout: () => http.post('/admin/auth/logout'),
+  adminRefresh: () => http.post('/admin/auth/refresh'),
   validateToken: () => http.get('/admin/auth/validate'),
 }
 
@@ -43,7 +115,7 @@ export const usersApi = {
 }
 
 export const projectsApi = {
-  list: () => http.get('/projects'),
+  list: (params) => http.get('/projects', { params }),
   getById: (id) => http.get(`/projects/${id}`),
   getByStatus: (status) => http.get(`/projects/status/${status}`),
   getByWard: (ward) => http.get(`/projects/ward/${ward}`),
@@ -55,7 +127,7 @@ export const projectsApi = {
 }
 
 export const donationsApi = {
-  list: () => http.get('/donations'),
+  list: (params) => http.get('/donations', { params }),
   getById: (id) => http.get(`/donations/${id}`),
   getByStatus: (status) => http.get(`/donations/status/${status}`),
   getByProject: (projectId) => http.get(`/donations/project/${projectId}`),
@@ -66,7 +138,7 @@ export const donationsApi = {
 }
 
 export const eventsApi = {
-  list: () => http.get('/events'),
+  list: (params) => http.get('/events', { params }),
   getById: (id) => http.get(`/events/${id}`),
   getUpcoming: () => http.get('/events/upcoming'),
   getByStatus: (status) => http.get(`/events/status/${status}`),
@@ -78,7 +150,7 @@ export const eventsApi = {
 }
 
 export const volunteersApi = {
-  list: () => http.get('/volunteers'),
+  list: (params) => http.get('/volunteers', { params }),
   getById: (id) => http.get(`/volunteers/${id}`),
   getByStatus: (status) => http.get(`/volunteers/status/${status}`),
   getByWard: (ward) => http.get(`/volunteers/ward/${ward}`),

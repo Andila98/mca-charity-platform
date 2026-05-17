@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment variables ###
+.env
+.env.local
+.env.production
+
+# Ignore Liquibase changelog/migration files
+**/src/main/resources/db/changelog/*
+# Ignore Flyway migration files
+**/src/main/resources/db/migration/*.sql
+# Ignore default Spring Boot initialization scripts
+**/src/main/resources/schema.sql
+**/src/main/resources/data.sql

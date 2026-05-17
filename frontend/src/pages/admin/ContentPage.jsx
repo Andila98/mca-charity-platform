@@ -1,8 +1,12 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { FiPlus, FiEdit2, FiTrash2, FiFileText } from 'react-icons/fi'
 import { contentApi } from '../../services/api'
+import { contentSchema } from '../../utils/validators'
+import { useRequireEditor } from '../../hooks/useRequireRole'
 import { formatRelative } from '../../utils/format'
 import EmptyState from '../../components/common/EmptyState'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
@@ -13,12 +17,17 @@ import { FormField, Input, Textarea } from '../../components/common/FormField'
 const PAGES = ['home', 'about', 'donate', 'events', 'volunteers', 'impact']
 
 export default function ContentPage() {
+  useRequireEditor()
   const qc = useQueryClient()
   const [selectedPage, setSelectedPage] = useState('home')
   const [modalOpen, setModalOpen] = useState(false)
   const [editItem, setEditItem] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
-  const [form, setForm] = useState({ contentKey: '', contentValue: '', description: '' })
+
+  const { register, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(contentSchema),
+    defaultValues: { contentKey: '', contentValue: '', description: '' },
+  })
 
   const { data, isLoading } = useQuery({
     queryKey: ['content', selectedPage],
@@ -39,13 +48,15 @@ export default function ContentPage() {
 
   const openEdit = (item) => {
     setEditItem(item)
-    setForm({ contentKey: item.contentKey, contentValue: item.contentValue, description: item.description || '' })
+    setValue('contentKey', item.contentKey)
+    setValue('contentValue', item.contentValue)
+    setValue('description', item.description || '')
     setModalOpen(true)
   }
 
   const openCreate = () => {
     setEditItem(null)
-    setForm({ contentKey: '', contentValue: '', description: '' })
+    reset()
     setModalOpen(true)
   }
 
@@ -105,21 +116,22 @@ export default function ContentPage() {
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editItem ? 'Edit Content' : 'Add Content'} size="md">
         <div className="space-y-4">
-          <FormField label="Content Key" required>
-            <Input value={form.contentKey} onChange={(e) => setForm({ ...form, contentKey: e.target.value })}
-              placeholder="e.g. hero_title" disabled={!!editItem} />
+          <FormField label="Content Key" required error={errors.contentKey?.message}>
+            <Input {...register('contentKey')} placeholder="e.g. hero_title" disabled={!!editItem}
+              error={errors.contentKey?.message} />
           </FormField>
-          <FormField label="Content Value" required>
-            <Textarea value={form.contentValue} onChange={(e) => setForm({ ...form, contentValue: e.target.value })}
-              placeholder="Enter content…" rows={5} />
+          <FormField label="Content Value" required error={errors.contentValue?.message}>
+            <Textarea {...register('contentValue')} placeholder="Enter content…" rows={5}
+              error={errors.contentValue?.message} />
           </FormField>
-          <FormField label="Description">
-            <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Brief description" />
+          <FormField label="Description" error={errors.description?.message}>
+            <Input {...register('description')} placeholder="Brief description"
+              error={errors.description?.message} />
           </FormField>
           <div className="flex gap-3 justify-end">
             <button className="btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-            <button className="btn-primary" onClick={() => saveMut.mutate(form)} disabled={saveMut.isPending}>
+            <button className="btn-primary" onClick={handleSubmit((data) => saveMut.mutate(data))}
+              disabled={saveMut.isPending || isSubmitting}>
               {saveMut.isPending ? 'Saving…' : 'Save'}
             </button>
           </div>

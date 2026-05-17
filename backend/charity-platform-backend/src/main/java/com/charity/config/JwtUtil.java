@@ -5,6 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,13 +16,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secretKey;
 
-    // Token validity: 10 hours
-    private final long EXPIRATION_TIME = 1000L * 60 * 60 * 10;
+    @Value("${jwt.access-token-expiration:900000}")
+    private long accessTokenExpiration;
+
+    // The dev-only fallback value baked into application.properties
+    private static final String DEV_FALLBACK_PREFIX = "dGVzdC1zZWNyZXQta2V5LWZvci11bml0";
+
+    /**
+     * Validates the JWT secret at startup.
+     * App refuses to start if the secret is missing or shorter than 256 bits.
+     */
+    @PostConstruct
+    public void validateSecretKey() {
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException("JWT_SECRET environment variable must be set");
+        }
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException("JWT_SECRET must be at least 256 bits (32 bytes) when base64-decoded");
+        }
+        if (secretKey.startsWith(DEV_FALLBACK_PREFIX)) {
+            log.warn("WARNING: Using the development JWT secret. Set the JWT_SECRET environment variable before deploying to production.");
+        }
+    }
 
     /**
      * Single signing key derived from config.
@@ -48,7 +72,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -91,5 +115,9 @@ public class JwtUtil {
     public boolean validateToken(String token, String subject) {
         final String extracted = extractUsername(token);
         return extracted.equals(subject) && !isTokenExpired(token);
+    }
+
+    public long getAccessTokenExpiration() {
+        return accessTokenExpiration;
     }
 }

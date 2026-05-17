@@ -4,8 +4,10 @@ import com.charity.config.JwtUtil;
 import com.charity.dto.request.AdminLoginRequest;
 import com.charity.dto.response.AdminLoginResponse;
 import com.charity.entity.AdminUser;
+import com.charity.entity.RefreshToken;
 import com.charity.exception.AdminAuthException;
 import com.charity.repository.AdminUserRepository;
+import com.charity.service.RefreshTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +28,9 @@ public class AdminAuthService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     /**
      * Authenticate admin user and generate JWT token
@@ -56,16 +61,18 @@ public class AdminAuthService {
         adminUserRepository.save(admin);
         log.info("Admin logged in successfully: {}", admin.getUsername());
 
-        // Step 5: Generate JWT token (10 hours validity)
-        String token = jwtUtil.generateToken(admin.getUsername());
+        // Step 5: Generate access token and refresh token
+        String accessToken = jwtUtil.generateToken(admin.getUsername());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(admin.getUsername(), "ADMIN");
 
         // Step 6: Return response
         return AdminLoginResponse.builder()
-                .token(token)
+                .token(accessToken)
+                .refreshToken(refreshToken.getToken())
                 .username(admin.getUsername())
                 .role(admin.getRole().toString())
                 .loginTime(LocalDateTime.now())
-                .expiresIn(10 * 60 * 60L) // 10 hours in seconds
+                .expiresIn(jwtUtil.getAccessTokenExpiration() / 1000)
                 .message("Login successful")
                 .build();
     }

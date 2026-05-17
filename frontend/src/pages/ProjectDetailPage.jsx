@@ -17,8 +17,8 @@ export default function ProjectDetailPage() {
   const project = projectRes?.data
   if (!project) return <div className="max-w-4xl mx-auto px-4 py-12 text-center text-gray-500">Project not found.</div>
 
-  const donations = donationsRes?.data || []
-  const events = eventsRes?.data || []
+  const donations = donationsRes?.data?.content || donationsRes?.data || []
+  const events = eventsRes?.data?.content || eventsRes?.data || []
   const totalRaised = donations.reduce((s, d) => s + (d.amount || 0), 0)
 
   return (

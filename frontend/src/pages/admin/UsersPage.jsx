@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { FiUserCheck, FiTrash2, FiUsers } from 'react-icons/fi'
+import { useRequireAdmin } from '../../hooks/useRequireRole'
 import { usersApi } from '../../services/api'
 import { formatDate } from '../../utils/format'
 import StatusBadge from '../../components/common/StatusBadge'
@@ -14,6 +15,7 @@ import Pagination from '../../components/common/Pagination'
 const PAGE_SIZE = 10
 
 export default function UsersPage() {
+  useRequireAdmin()
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('approved')
@@ -35,7 +37,9 @@ export default function UsersPage() {
     onError: () => toast.error('Failed to delete user'),
   })
 
-  const rawUsers = tab === 'approved' ? (approvedRes?.data || []) : (pendingRes?.data || [])
+  const rawUsers = tab === 'approved'
+    ? (approvedRes?.data?.content || approvedRes?.data || [])
+    : (pendingRes?.data?.content || pendingRes?.data || [])
   const users = rawUsers.filter((u) => !search || u.fullName?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase()))
   const totalPages = Math.ceil(users.length / PAGE_SIZE)
   const paginated = users.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -53,7 +57,7 @@ export default function UsersPage() {
         {[['approved', 'Approved'], ['pending', 'Pending Approval']].map(([key, label]) => (
           <button key={key} onClick={() => { setTab(key); setPage(1) }}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${tab === key ? 'bg-blue-600 text-white' : 'bg-white border text-gray-600 hover:bg-gray-50'}`}>
-            {label} {key === 'pending' && pendingRes?.data?.length ? `(${pendingRes.data.length})` : ''}
+            {label} {key === 'pending' && (pendingRes?.data?.content || pendingRes?.data || []).length ? `(${(pendingRes?.data?.content || pendingRes?.data || []).length})` : ''}
           </button>
         ))}
       </div>

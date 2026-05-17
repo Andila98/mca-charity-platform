@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { authApi } from '../services/api'
+import { tokenStore } from '../services/tokenStore'
 
 const AuthContext = createContext(null)
 
@@ -11,15 +12,48 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const savedUser = localStorage.getItem('user')
     const savedAdmin = localStorage.getItem('admin_user')
-    if (savedUser) setUser(JSON.parse(savedUser))
-    if (savedAdmin) setAdmin(JSON.parse(savedAdmin))
-    setLoading(false)
+
+    const rehydrate = async () => {
+      const tasks = []
+      if (savedAdmin) {
+        tasks.push(
+          authApi.adminRefresh()
+            .then(({ data }) => {
+              tokenStore.setAdminToken(data.accessToken)
+              setAdmin(JSON.parse(savedAdmin))
+            })
+            .catch(() => localStorage.removeItem('admin_user'))
+        )
+      }
+      if (savedUser) {
+        tasks.push(
+          authApi.refresh()
+            .then(({ data }) => {
+              tokenStore.setAuthToken(data.accessToken)
+              setUser(JSON.parse(savedUser))
+            })
+            .catch(() => localStorage.removeItem('user'))
+        )
+      }
+      await Promise.allSettled(tasks)
+      setLoading(false)
+    }
+
+    if (savedAdmin || savedUser) {
+      rehydrate()
+    } else {
+      setLoading(false)
+    }
   }, [])
 
   const login = useCallback(async (credentials) => {
     const res = await authApi.login(credentials)
-    const { token, user: userData } = res.data
-    localStorage.setItem('auth_token', token)
+    // Refresh token is delivered as an httpOnly cookie — not stored in localStorage
+    const { token, email, fullName, role } = res.data
+
+    tokenStore.setAuthToken(token)
+
+    const userData = { email, fullName, role }
     localStorage.setItem('user', JSON.stringify(userData))
     setUser(userData)
     return userData
@@ -27,8 +61,12 @@ export function AuthProvider({ children }) {
 
   const adminLogin = useCallback(async (credentials) => {
     const res = await authApi.adminLogin(credentials)
-    const { token, admin: adminData } = res.data
-    localStorage.setItem('admin_token', token)
+    // Refresh token is delivered as an httpOnly cookie — not stored in localStorage
+    const { token, username, role } = res.data
+
+    tokenStore.setAdminToken(token)
+
+    const adminData = { username, role }
     localStorage.setItem('admin_user', JSON.stringify(adminData))
     setAdmin(adminData)
     return adminData
@@ -39,14 +77,25 @@ export function AuthProvider({ children }) {
     return res.data
   }, [])
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('auth_token')
+  const logout = useCallback(async () => {
+    try {
+      // Backend revokes the refresh token and clears the httpOnly cookie
+      await authApi.logout()
+    } catch {
+      // Token already invalid — still clear local state
+    }
+    tokenStore.clearAuthToken()
     localStorage.removeItem('user')
     setUser(null)
   }, [])
 
-  const adminLogout = useCallback(() => {
-    localStorage.removeItem('admin_token')
+  const adminLogout = useCallback(async () => {
+    try {
+      await authApi.adminLogout()
+    } catch {
+      // Token already invalid — still clear local state
+    }
+    tokenStore.clearAdminToken()
     localStorage.removeItem('admin_user')
     setAdmin(null)
   }, [])

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { FiDollarSign, FiTrash2, FiEdit2 } from 'react-icons/fi'
+import { useRequireEditor } from '../../hooks/useRequireRole'
 import { donationsApi } from '../../services/api'
 import { formatDate, formatCurrency } from '../../utils/format'
 import { DONATION_STATUS, DONATION_TYPE } from '../../utils/constants'
@@ -17,6 +18,7 @@ import { FormField, Select } from '../../components/common/FormField'
 const PAGE_SIZE = 10
 
 export default function DonationsPage() {
+  useRequireEditor()
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -37,13 +39,14 @@ export default function DonationsPage() {
     onSuccess: () => { toast.success('Status updated'); qc.invalidateQueries({ queryKey: ['admin-donations'] }); setEditDonation(null) },
   })
 
-  const donations = (data?.data || [])
+  const allDonations = data?.data?.content || data?.data || []
+  const donations = allDonations
     .filter((d) => {
       const matchSearch = !search || d.donorName?.toLowerCase().includes(search.toLowerCase()) || d.donorEmail?.toLowerCase().includes(search.toLowerCase())
       return matchSearch && (!statusFilter || d.status === statusFilter)
     })
 
-  const totalRaised = (data?.data || []).filter(d => d.type === 'CASH').reduce((s, d) => s + (d.amount || 0), 0)
+  const totalRaised = allDonations.filter(d => d.type === 'CASH').reduce((s, d) => s + (d.amount || 0), 0)
   const totalPages = Math.ceil(donations.length / PAGE_SIZE)
   const paginated = donations.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 

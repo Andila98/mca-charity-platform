@@ -4,6 +4,7 @@ import com.charity.dto.request.RegisterRequest;
 import com.charity.dto.request.UserRequest;
 import com.charity.dto.response.UserResponse;
 import com.charity.entity.User;
+import com.charity.entity.UserRole;
 
 public class UserMapper {
 
@@ -27,7 +28,7 @@ public class UserMapper {
         user.setFullName(request.getFullName());
         user.setPhone(request.getPhone());
         user.setWard(request.getWard());
-        user.setRole(request.getRole());
+        user.setRole(UserRole.VIEWER); // Never trust client-supplied role
         user.setApproved(false); // Default: not approved
         return user;
     }

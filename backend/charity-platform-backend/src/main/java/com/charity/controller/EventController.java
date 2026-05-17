@@ -3,6 +3,7 @@ package com.charity.controller;
 
 import com.charity.dto.request.EventRequest;
 import com.charity.dto.response.EventResponse;
+import com.charity.dto.response.PagedResponse;
 import com.charity.entity.CharityProject;
 import com.charity.entity.Event;
 import com.charity.entity.EventStatus;
@@ -13,6 +14,9 @@ import com.charity.service.EventService;
 import com.charity.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +45,15 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EventResponse>> getAllEvents() {
-        return ResponseEntity.ok(
-                eventService.getAllEvents().stream().map(EventMapper::toResponse).collect(Collectors.toList())
-        );
+    public ResponseEntity<PagedResponse<EventResponse>> getAllEvents(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "eventDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Page<EventResponse> result = eventService.getAllEvents(PageRequest.of(page, size, sort))
+                .map(EventMapper::toResponse);
+        return ResponseEntity.ok(PagedResponse.from(result));
     }
 
     @GetMapping("/{id}")
@@ -60,10 +69,13 @@ public class EventController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<EventResponse>> getEventsByStatus(@PathVariable EventStatus status) {
-        return ResponseEntity.ok(
-                eventService.getEventsByStatus(status).stream().map(EventMapper::toResponse).collect(Collectors.toList())
-        );
+    public ResponseEntity<PagedResponse<EventResponse>> getEventsByStatus(
+            @PathVariable EventStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Page<EventResponse> result = eventService.getEventsByStatus(status, PageRequest.of(page, size, Sort.by("eventDate").ascending()))
+                .map(EventMapper::toResponse);
+        return ResponseEntity.ok(PagedResponse.from(result));
     }
 
     @GetMapping("/project/{projectId}")

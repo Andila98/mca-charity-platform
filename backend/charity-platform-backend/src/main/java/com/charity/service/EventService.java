@@ -6,6 +6,8 @@ import com.charity.repository.*;
 import com.charity.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +55,10 @@ public class EventService {
         return eventRepository.findAll();
     }
 
+    public Page<Event> getAllEvents(Pageable pageable) {
+        return eventRepository.findAll(pageable);
+    }
+
     public List<Event> getUpcomingEvents() {
         return eventRepository.findUpcomingEvents(LocalDateTime.now());
     }
@@ -75,6 +81,10 @@ public class EventService {
 
     public List<Event> getEventsByStatus(EventStatus status) {
         return eventRepository.findByStatus(status);
+    }
+
+    public Page<Event> getEventsByStatus(EventStatus status, Pageable pageable) {
+        return eventRepository.findByStatus(status, pageable);
     }
 
     /**
@@ -139,6 +149,10 @@ public class EventService {
     }
 
     public void deleteEvent(Long id) {
-        eventRepository.delete(getEventById(id));
+        Event event = getEventById(id);
+        event.setDeleted(true);
+        event.setDeletedAt(java.time.LocalDateTime.now());
+        eventRepository.save(event);
+        log.info("Event soft-deleted: ID {}", id);
     }
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRequireEditor } from '../../hooks/useRequireRole'
 import { toast } from 'react-toastify'
 import { FiPlus, FiEdit2, FiTrash2, FiFolderPlus } from 'react-icons/fi'
 import { projectsApi } from '../../services/api'
@@ -20,6 +21,7 @@ import { FormField, Input, Select, Textarea } from '../../components/common/Form
 const PAGE_SIZE = 10
 
 export default function ProjectsPage() {
+  useRequireEditor()
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -58,7 +60,7 @@ export default function ProjectsPage() {
 
   const openCreate = () => { setEditProject(null); reset(); setModalOpen(true) }
 
-  const projects = (data?.data || [])
+  const projects = (data?.data?.content || data?.data || [])
     .filter((p) => (!search || p.name?.toLowerCase().includes(search.toLowerCase())) && (!statusFilter || p.status === statusFilter))
   const totalPages = Math.ceil(projects.length / PAGE_SIZE)
   const paginated = projects.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)

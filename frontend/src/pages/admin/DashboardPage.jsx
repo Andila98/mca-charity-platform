@@ -30,11 +30,11 @@ export default function DashboardPage() {
   const isLoading = lu || lp || ld || le || lv
   if (isLoading) return <LoadingSpinner />
 
-  const users = usersRes?.data || []
-  const projects = projectsRes?.data || []
-  const donations = donationsRes?.data || []
-  const events = eventsRes?.data || []
-  const volunteers = volunteersRes?.data || []
+  const users = usersRes?.data?.content || usersRes?.data || []
+  const projects = projectsRes?.data?.content || projectsRes?.data || []
+  const donations = donationsRes?.data?.content || donationsRes?.data || []
+  const events = eventsRes?.data?.content || eventsRes?.data || []
+  const volunteers = volunteersRes?.data?.content || volunteersRes?.data || []
 
   const totalRaised = donations.reduce((s, d) => s + (d.amount || 0), 0)
   const pendingDonations = donations.filter((d) => d.status === 'PENDING')

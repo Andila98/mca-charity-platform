@@ -19,7 +19,7 @@ export default function EventsPage() {
 
   const { data, isLoading } = useQuery({ queryKey: ['events'], queryFn: () => eventsApi.list() })
 
-  const events = (data?.data || [])
+  const events = (data?.data?.content || data?.data || [])
     .filter((e) => {
       const matchSearch = !search || e.name?.toLowerCase().includes(search.toLowerCase()) || e.location?.toLowerCase().includes(search.toLowerCase())
       const matchStatus = !statusFilter || e.status === statusFilter

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { FiHeart, FiTrash2, FiEdit2 } from 'react-icons/fi'
+import { useRequireEditor } from '../../hooks/useRequireRole'
 import { volunteersApi } from '../../services/api'
 import { formatDate } from '../../utils/format'
 import { VOLUNTEER_STATUS } from '../../utils/constants'
@@ -15,6 +16,7 @@ import Pagination from '../../components/common/Pagination'
 const PAGE_SIZE = 10
 
 export default function VolunteersPage() {
+  useRequireEditor()
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -29,7 +31,7 @@ export default function VolunteersPage() {
     onError: () => toast.error('Failed to remove volunteer'),
   })
 
-  const volunteers = (data?.data || [])
+  const volunteers = (data?.data?.content || data?.data || [])
     .filter((v) => {
       const matchSearch = !search || v.name?.toLowerCase().includes(search.toLowerCase()) || v.email?.toLowerCase().includes(search.toLowerCase())
       return matchSearch && (!statusFilter || v.status === statusFilter)

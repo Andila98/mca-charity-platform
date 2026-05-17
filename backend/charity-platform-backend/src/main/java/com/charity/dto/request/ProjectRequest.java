@@ -1,7 +1,7 @@
 package com.charity.dto.request;
 
-
 import com.charity.entity.ProjectStatus;
+import com.charity.validation.ValidWard;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -24,6 +24,7 @@ public class ProjectRequest {
     private String description;
 
     @NotBlank(message = "Ward is required")
+    @ValidWard
     private String ward;
 
     private ProjectStatus status;

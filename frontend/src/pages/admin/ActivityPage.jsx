@@ -14,8 +14,8 @@ export default function ActivityPage() {
     queryFn: () => imagesApi.getRecent(20),
   })
 
-  const recentContent = contentRes?.data || []
-  const recentImages = imagesRes?.data || []
+  const recentContent = contentRes?.data?.content || contentRes?.data || []
+  const recentImages = imagesRes?.data?.content || imagesRes?.data || []
 
   const combined = [
     ...recentContent.map((c) => ({ ...c, _type: 'content', _time: c.updatedAt })),

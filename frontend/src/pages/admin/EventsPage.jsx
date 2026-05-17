@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRequireEditor } from '../../hooks/useRequireRole'
 import { toast } from 'react-toastify'
 import { FiPlus, FiEdit2, FiTrash2, FiCalendar } from 'react-icons/fi'
 import { eventsApi } from '../../services/api'
@@ -20,6 +21,7 @@ import { FormField, Input, Select, Textarea } from '../../components/common/Form
 const PAGE_SIZE = 10
 
 export default function EventsPage() {
+  useRequireEditor()
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -56,7 +58,7 @@ export default function EventsPage() {
     setModalOpen(true)
   }
 
-  const events = (data?.data || [])
+  const events = (data?.data?.content || data?.data || [])
     .filter((e) => (!search || e.name?.toLowerCase().includes(search.toLowerCase()) || e.location?.toLowerCase().includes(search.toLowerCase())) && (!statusFilter || e.status === statusFilter))
   const totalPages = Math.ceil(events.length / PAGE_SIZE)
   const paginated = events.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)

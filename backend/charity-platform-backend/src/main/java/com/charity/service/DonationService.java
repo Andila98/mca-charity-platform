@@ -6,6 +6,8 @@ import com.charity.repository.*;
 import com.charity.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,8 +80,16 @@ public class DonationService {
         return donationRepository.findAll();
     }
 
+    public Page<Donation> getAllDonations(Pageable pageable) {
+        return donationRepository.findAll(pageable);
+    }
+
     public List<Donation> getDonationsByStatus(DonationStatus status) {
         return donationRepository.findByStatus(status);
+    }
+
+    public Page<Donation> getDonationsByStatus(DonationStatus status, Pageable pageable) {
+        return donationRepository.findByStatus(status, pageable);
     }
 
     public List<Donation> getPendingDonations() {
@@ -130,7 +140,10 @@ public class DonationService {
     }
 
     public void deleteDonation(Long id) {
-        donationRepository.delete(getDonationById(id));
-        log.info("Donation deleted: ID {}", id);
+        Donation donation = getDonationById(id);
+        donation.setDeleted(true);
+        donation.setDeletedAt(java.time.LocalDateTime.now());
+        donationRepository.save(donation);
+        log.info("Donation soft-deleted: ID {}", id);
     }
 }

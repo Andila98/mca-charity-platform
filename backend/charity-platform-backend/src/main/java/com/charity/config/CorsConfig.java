@@ -7,7 +7,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -27,40 +26,25 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // ✅ SECURE: Only allow specific origins
-        //configuration.setAllowedOrigins(allowedOrigins);
-
-        // Alternative for development (more flexible but still secure):
-         configuration.setAllowedOriginPatterns(Arrays.asList(
-             "http://localhost:[*]",
-             "http://127.0.0.1:[*]"
-         ));
+        // Exact origins from cors.allowed-origins property (env-var configurable for prod)
+        configuration.setAllowedOrigins(allowedOrigins);
 
         // Allow these HTTP methods
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "PATCH",
-                "OPTIONS"
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
         ));
 
         // Allow these headers
-        configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "Accept",
-                "Origin",
-                "Access-Control-Request-Method",
-                "Access-Control-Request-Headers",
-                "X-Requested-With"
+        configuration.setAllowedHeaders(List.of(
+                "Authorization", "Content-Type", "Accept", "Origin",
+                "Access-Control-Request-Method", "Access-Control-Request-Headers", "X-Requested-With"
         ));
 
         // Expose these headers to the frontend
-        configuration.setExposedHeaders(Arrays.asList(
+        configuration.setExposedHeaders(List.of(
                 "Authorization",
-                "Content-Type"
+                "Content-Type",
+                "Set-Cookie"
         ));
 
         // ✅ SECURE: Allow credentials with specific origins

@@ -4,6 +4,7 @@ import com.charity.config.JwtUtil;
 import com.charity.dto.request.LoginRequest;
 import com.charity.dto.request.RegisterRequest;
 import com.charity.dto.response.LoginResponse;
+import com.charity.entity.RefreshToken;
 import com.charity.entity.User;
 import com.charity.exception.UserAlreadyExistsException;
 import com.charity.mapper.UserMapper;
@@ -22,6 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     public User register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -45,10 +47,13 @@ public class AuthService {
             throw new IllegalStateException("Error: Your account is pending approval");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String accessToken = jwtUtil.generateToken(user.getEmail());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getEmail(), "USER");
 
         return new LoginResponse(
-                token,
+                accessToken,
+                refreshToken.getToken(),
+                jwtUtil.getAccessTokenExpiration() / 1000,
                 user.getEmail(),
                 user.getFullName(),
                 user.getRole().toString(),

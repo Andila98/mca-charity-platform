@@ -5,6 +5,8 @@ import com.charity.repository.*;
 import com.charity.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -54,6 +56,18 @@ public class VolunteerService {
      */
     public List<Volunteer> getAllActiveVolunteers() {
         return volunteerRepository.findByStatusOrderByLastActiveAtDesc(VolunteerStatus.ACTIVE);
+    }
+
+    public Page<Volunteer> getAllVolunteers(Pageable pageable) {
+        return volunteerRepository.findAll(pageable);
+    }
+
+    public Page<Volunteer> getVolunteersByStatus(VolunteerStatus status, Pageable pageable) {
+        return volunteerRepository.findByStatus(status, pageable);
+    }
+
+    public Page<Volunteer> getVolunteersByWard(String ward, Pageable pageable) {
+        return volunteerRepository.findByWard(ward, pageable);
     }
 
     /**

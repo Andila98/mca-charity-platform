@@ -1,13 +1,21 @@
 package com.charity.controller;
 
 import com.charity.dto.request.ProjectRequest;
+import com.charity.dto.response.PagedResponse;
 import com.charity.dto.response.ProjectResponse;
 import com.charity.entity.CharityProject;
 import com.charity.entity.ProjectStatus;
 import com.charity.mapper.ProjectMapper;
 import com.charity.service.CharityProjectService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +26,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
+@Tag(name = "Charity Projects", description = "Create and manage charity projects")
 public class CharityProjectController {
 
     private final CharityProjectService projectService;
 
-    /**
-     * FIX #4: Controller no longer fetches User before calling the service.
-     * The service owns the User lookup — one DB hit instead of two.
-     */
+    @Operation(summary = "Create a charity project")
+    @ApiResponse(responseCode = "201", description = "Project created")
+    @ApiResponse(responseCode = "400", description = "Validation error")
+    @ApiResponse(responseCode = "404", description = "Creator user not found")
     @PostMapping
     public ResponseEntity<?> createProject(@Valid @RequestBody ProjectRequest request) {
         CharityProject project = ProjectMapper.toEntity(request, null); // creator set inside service
@@ -34,36 +43,49 @@ public class CharityProjectController {
                 .body(ProjectMapper.toResponse(savedProject));
     }
 
+    @Operation(summary = "List all projects (paginated)")
+    @ApiResponse(responseCode = "200", description = "Page of projects")
     @GetMapping
-    public ResponseEntity<List<ProjectResponse>> getAllProjects() {
-        return ResponseEntity.ok(
-                projectService.getAllProjects().stream()
-                        .map(ProjectMapper::toResponse)
-                        .collect(Collectors.toList())
-        );
+    public ResponseEntity<PagedResponse<ProjectResponse>> getAllProjects(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ProjectResponse> result = projectService.getAllProjects(pageable).map(ProjectMapper::toResponse);
+        return ResponseEntity.ok(PagedResponse.from(result));
     }
 
+    @Operation(summary = "Get project by ID")
+    @ApiResponse(responseCode = "200", description = "Project found")
+    @ApiResponse(responseCode = "404", description = "Project not found")
     @GetMapping("/{id}")
     public ResponseEntity<?> getProjectById(@PathVariable Long id) {
         return ResponseEntity.ok(ProjectMapper.toResponse(projectService.getProjectById(id)));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<ProjectResponse>> getProjectsByStatus(@PathVariable ProjectStatus status) {
-        return ResponseEntity.ok(
-                projectService.getProjectsByStatus(status).stream()
-                        .map(ProjectMapper::toResponse)
-                        .collect(Collectors.toList())
-        );
+    public ResponseEntity<PagedResponse<ProjectResponse>> getProjectsByStatus(
+            @PathVariable ProjectStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Page<ProjectResponse> result = projectService.getProjectsByStatus(status, PageRequest.of(page, size, sort))
+                .map(ProjectMapper::toResponse);
+        return ResponseEntity.ok(PagedResponse.from(result));
     }
 
     @GetMapping("/ward/{ward}")
-    public ResponseEntity<List<ProjectResponse>> getProjectsByWard(@PathVariable String ward) {
-        return ResponseEntity.ok(
-                projectService.getProjectsByWard(ward).stream()
-                        .map(ProjectMapper::toResponse)
-                        .collect(Collectors.toList())
-        );
+    public ResponseEntity<PagedResponse<ProjectResponse>> getProjectsByWard(
+            @PathVariable String ward,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Page<ProjectResponse> result = projectService.getProjectsByWard(ward, PageRequest.of(page, size, Sort.by("createdAt").descending()))
+                .map(ProjectMapper::toResponse);
+        return ResponseEntity.ok(PagedResponse.from(result));
     }
 
     @GetMapping("/creator/{userId}")
@@ -84,6 +106,9 @@ public class CharityProjectController {
         );
     }
 
+    @Operation(summary = "Update a project")
+    @ApiResponse(responseCode = "200", description = "Project updated")
+    @ApiResponse(responseCode = "404", description = "Project not found")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProject(
             @PathVariable Long id,
@@ -96,6 +121,9 @@ public class CharityProjectController {
         return ResponseEntity.ok(ProjectMapper.toResponse(updated));
     }
 
+    @Operation(summary = "Soft-delete a project")
+    @ApiResponse(responseCode = "200", description = "Project deleted")
+    @ApiResponse(responseCode = "404", description = "Project not found")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);

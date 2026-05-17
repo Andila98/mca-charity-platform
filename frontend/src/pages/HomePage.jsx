@@ -4,6 +4,7 @@ import { FiArrowRight, FiHeart, FiUsers, FiFolderPlus, FiCalendar } from 'react-
 import { projectsApi } from '../services/api'
 import { eventsApi } from '../services/api'
 import { formatDate, truncate } from '../utils/format'
+import { HOMEPAGE_STATS_FALLBACK } from '../utils/constants'
 import StatusBadge from '../components/common/StatusBadge'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 
@@ -29,9 +30,9 @@ export default function HomePage() {
     queryFn: () => eventsApi.getUpcoming(),
   })
 
-  const projects = projectsRes?.data?.slice(0, 3) || []
-  const events = eventsRes?.data?.slice(0, 3) || []
-  const allProjects = projectsRes?.data || []
+  const allProjects = projectsRes?.data?.content || projectsRes?.data || []
+  const projects = allProjects.slice(0, 3)
+  const events = (eventsRes?.data?.content || eventsRes?.data || []).slice(0, 3)
 
   return (
     <div>
@@ -61,10 +62,10 @@ export default function HomePage() {
       {/* Stats */}
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
-          <StatCard icon={FiFolderPlus} value={allProjects.length || '50+'} label="Active Projects" color="bg-blue-600" />
-          <StatCard icon={FiUsers} value="1,200+" label="Volunteers" color="bg-green-600" />
-          <StatCard icon={FiHeart} value="KES 2M+" label="Donations Raised" color="bg-red-500" />
-          <StatCard icon={FiCalendar} value={events.length || '30+'} label="Events Held" color="bg-purple-600" />
+          <StatCard icon={FiFolderPlus} value={allProjects.length || HOMEPAGE_STATS_FALLBACK.projectsFallback} label="Active Projects" color="bg-blue-600" />
+          <StatCard icon={FiUsers} value={HOMEPAGE_STATS_FALLBACK.volunteers} label="Volunteers" color="bg-green-600" />
+          <StatCard icon={FiHeart} value={HOMEPAGE_STATS_FALLBACK.donations} label="Donations Raised" color="bg-red-500" />
+          <StatCard icon={FiCalendar} value={events.length || HOMEPAGE_STATS_FALLBACK.eventsFallback} label="Events Held" color="bg-purple-600" />
         </div>
       </section>
 

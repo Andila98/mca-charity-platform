@@ -23,7 +23,7 @@ export default function ProjectsPage() {
     queryFn: () => projectsApi.list(),
   })
 
-  const projects = (data?.data || [])
+  const projects = (data?.data?.content || data?.data || [])
     .filter((p) => {
       const matchSearch = !search || p.name?.toLowerCase().includes(search.toLowerCase()) || p.description?.toLowerCase().includes(search.toLowerCase())
       const matchStatus = !statusFilter || p.status === statusFilter

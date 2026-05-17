@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponse {
     private String token;
+    private String refreshToken;
+    private long expiresIn;
     private String email;
     private String fullName;
     private String role;

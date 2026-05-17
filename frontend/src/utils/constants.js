@@ -20,6 +20,13 @@ export const VOLUNTEER_INTERESTS = [
   'Disaster Response', 'Arts & Culture',
 ]
 
+export const HOMEPAGE_STATS_FALLBACK = {
+  volunteers: '1,200+',
+  donations: 'KES 2M+',
+  projectsFallback: '50+',
+  eventsFallback: '30+',
+}
+
 export const STATUS_COLORS = {
   ACTIVE: 'bg-green-100 text-green-800',
   COMPLETED: 'bg-blue-100 text-blue-800',

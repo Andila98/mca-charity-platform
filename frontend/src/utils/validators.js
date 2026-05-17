@@ -68,3 +68,10 @@ export const volunteerSchema = z.object({
   interests: z.array(z.string()).min(1, 'Select at least one interest'),
   bio: z.string().optional(),
 })
+
+export const contentSchema = z.object({
+  contentKey: z.string().min(1, 'Content key is required')
+    .regex(/^[a-z0-9_]+$/, 'Lowercase letters, numbers, and underscores only'),
+  contentValue: z.string().min(1, 'Content value is required'),
+  description: z.string().optional(),
+})

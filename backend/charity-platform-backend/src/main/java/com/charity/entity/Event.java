@@ -6,11 +6,13 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "events")
+@SQLRestriction("deleted = false")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -57,6 +59,10 @@ public class Event {
     private EventStatus status; // PLANNED, ONGOING, COMPLETED, CANCELLED
 
     private LocalDateTime createdAt;
+
+    private boolean deleted = false;
+
+    private LocalDateTime deletedAt;
 
     @PrePersist
     protected void onCreate() {

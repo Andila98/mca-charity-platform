@@ -6,6 +6,8 @@ import com.charity.repository.*;
 import com.charity.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,16 +50,32 @@ public class CharityProjectService {
         return projectRepository.findAll();
     }
 
+    public Page<CharityProject> getAllProjects(Pageable pageable) {
+        return projectRepository.findAll(pageable);
+    }
+
     public List<CharityProject> getProjectsByStatus(ProjectStatus status) {
         return projectRepository.findByStatus(status);
+    }
+
+    public Page<CharityProject> getProjectsByStatus(ProjectStatus status, Pageable pageable) {
+        return projectRepository.findByStatus(status, pageable);
     }
 
     public List<CharityProject> getProjectsByWard(String ward) {
         return projectRepository.findByWard(ward);
     }
 
+    public Page<CharityProject> getProjectsByWard(String ward, Pageable pageable) {
+        return projectRepository.findByWard(ward, pageable);
+    }
+
     public List<CharityProject> getProjectsByCategory(String category) {
         return projectRepository.findByCategory(category);
+    }
+
+    public Page<CharityProject> getProjectsByCategory(String category, Pageable pageable) {
+        return projectRepository.findByCategory(category, pageable);
     }
 
     public List<CharityProject> getTopProjectsByImpact() {
@@ -99,7 +117,9 @@ public class CharityProjectService {
 
     public void deleteProject(Long id) {
         CharityProject project = getProjectById(id);
-        projectRepository.delete(project);
-        log.info("Project deleted: ID {}", id);
+        project.setDeleted(true);
+        project.setDeletedAt(java.time.LocalDateTime.now());
+        projectRepository.save(project);
+        log.info("Project soft-deleted: ID {}", id);
     }
 }

@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
+import ErrorBoundary from './components/common/ErrorBoundary'
 import NavBar from './components/common/NavBar'
 import Footer from './components/common/Footer'
 import AdminLayout from './pages/admin/AdminLayout'
@@ -41,6 +42,7 @@ function PublicLayout({ children }) {
 export default function App() {
   return (
     <>
+      <ErrorBoundary>
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
@@ -70,6 +72,7 @@ export default function App() {
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
+      </ErrorBoundary>
       <ToastContainer position="bottom-right" autoClose={4000} />
     </>
   )
